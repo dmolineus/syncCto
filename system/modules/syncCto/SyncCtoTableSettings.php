@@ -9,6 +9,8 @@
  * @filesource
  */
 
+use SyncCto\Enum;
+
 /**
  * Class for syncCto settings
  */
@@ -120,7 +122,7 @@ class SyncCtoTableSettings extends Backend
     public function localconfigEntries()
     {
         // Get entries from localconfig.
-        $arrLocalconfig = $this->objSyncCtoHelper->loadConfigs(SyncCtoEnum::LOADCONFIG_KEYS_ONLY);
+        $arrLocalconfig = $this->objSyncCtoHelper->loadConfigs(Enum::LOADCONFIG_KEYS_ONLY);
 
         // Load all fields for tl_settings.
         if (empty($GLOBALS['TL_DCA']['tl_settings']))

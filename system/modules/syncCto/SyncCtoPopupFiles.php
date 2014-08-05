@@ -9,6 +9,8 @@
  * @filesource
  */
 
+use SyncCto\Enum;
+
 /**
  * Initialize the system
  */
@@ -151,32 +153,32 @@ class SyncCtoPopupFiles extends \Backend
             {
                 switch ($value['state'])
                 {
-                    case SyncCtoEnum::FILESTATE_TOO_BIG_MISSING:
-                    case SyncCtoEnum::FILESTATE_MISSING:
+                    case Enum::FILESTATE_TOO_BIG_MISSING:
+                    case Enum::FILESTATE_MISSING:
                         $intCountMissing++;
                         $intTotalSizeNew += $value["size"];
                         break;
 
-                    case SyncCtoEnum::FILESTATE_TOO_BIG_NEED:
-                    case SyncCtoEnum::FILESTATE_NEED:
+                    case Enum::FILESTATE_TOO_BIG_NEED:
+                    case Enum::FILESTATE_NEED:
                         $intCountNeed++;
                         $intTotalSizeChange += $value["size"];
                         break;
 
-                    case SyncCtoEnum::FILESTATE_TOO_BIG_DELETE :
-                    case SyncCtoEnum::FILESTATE_DELETE:
-                    case SyncCtoEnum::FILESTATE_FOLDER_DELETE:
+                    case Enum::FILESTATE_TOO_BIG_DELETE :
+                    case Enum::FILESTATE_DELETE:
+                    case Enum::FILESTATE_FOLDER_DELETE:
                         $intCountDelete++;
                         $intTotalSizeDel += $value["size"];
                         break;
 
-                    case SyncCtoEnum::FILESTATE_BOMBASTIC_BIG:
+                    case Enum::FILESTATE_BOMBASTIC_BIG:
                         $intCountIgnored++;
                         break;
                 }
 
                 // Check for dbafs conflict.
-                if($value["state"] == SyncCtoEnum::FILESTATE_DBAFS_CONFLICT || isset($value["dbafs_state"]) || isset($value["dbafs_tail_state"]))
+                if($value["state"] == Enum::FILESTATE_DBAFS_CONFLICT || isset($value["dbafs_state"]) || isset($value["dbafs_tail_state"]))
                 {
                     $intCountDbafsConflict++;
                     $value['dbafs_conflict'] = true;
@@ -184,11 +186,11 @@ class SyncCtoPopupFiles extends \Backend
 
                 if (in_array($value["state"],
                     array(
-                        SyncCtoEnum::FILESTATE_TOO_BIG_DELETE,
-                        SyncCtoEnum::FILESTATE_TOO_BIG_MISSING,
-                        SyncCtoEnum::FILESTATE_TOO_BIG_NEED,
-                        SyncCtoEnum::FILESTATE_TOO_BIG_SAME,
-                        SyncCtoEnum::FILESTATE_BOMBASTIC_BIG
+                        Enum::FILESTATE_TOO_BIG_DELETE,
+                        Enum::FILESTATE_TOO_BIG_MISSING,
+                        Enum::FILESTATE_TOO_BIG_NEED,
+                        Enum::FILESTATE_TOO_BIG_SAME,
+                        Enum::FILESTATE_BOMBASTIC_BIG
                     ))
                 )
                 {
@@ -217,15 +219,15 @@ class SyncCtoPopupFiles extends \Backend
 
         // Language array for filestate
         $arrLanguageTags                                         = array();
-        $arrLanguageTags[SyncCtoEnum::FILESTATE_MISSING]         = $GLOBALS['TL_LANG']['MSC']['create'];
-        $arrLanguageTags[SyncCtoEnum::FILESTATE_NEED]            = $GLOBALS['TL_LANG']['MSC']['overrideSelected'];
-        $arrLanguageTags[SyncCtoEnum::FILESTATE_DELETE]          = $GLOBALS['TL_LANG']['MSC']['delete'];
-        $arrLanguageTags[SyncCtoEnum::FILESTATE_FOLDER_DELETE]   = $GLOBALS['TL_LANG']['MSC']['delete'];
-        $arrLanguageTags[SyncCtoEnum::FILESTATE_TOO_BIG_MISSING] = $GLOBALS['TL_LANG']['MSC']['skipped'];
-        $arrLanguageTags[SyncCtoEnum::FILESTATE_TOO_BIG_NEED]    = $GLOBALS['TL_LANG']['MSC']['skipped'];
-        $arrLanguageTags[SyncCtoEnum::FILESTATE_TOO_BIG_DELETE]  = $GLOBALS['TL_LANG']['MSC']['skipped'];
-        $arrLanguageTags[SyncCtoEnum::FILESTATE_BOMBASTIC_BIG]   = $GLOBALS['TL_LANG']['MSC']['ignored'];
-        $arrLanguageTags[SyncCtoEnum::FILESTATE_DBAFS_CONFLICT]  = $GLOBALS['TL_LANG']['MSC']['dbafs_conflict'];
+        $arrLanguageTags[Enum::FILESTATE_MISSING]         = $GLOBALS['TL_LANG']['MSC']['create'];
+        $arrLanguageTags[Enum::FILESTATE_NEED]            = $GLOBALS['TL_LANG']['MSC']['overrideSelected'];
+        $arrLanguageTags[Enum::FILESTATE_DELETE]          = $GLOBALS['TL_LANG']['MSC']['delete'];
+        $arrLanguageTags[Enum::FILESTATE_FOLDER_DELETE]   = $GLOBALS['TL_LANG']['MSC']['delete'];
+        $arrLanguageTags[Enum::FILESTATE_TOO_BIG_MISSING] = $GLOBALS['TL_LANG']['MSC']['skipped'];
+        $arrLanguageTags[Enum::FILESTATE_TOO_BIG_NEED]    = $GLOBALS['TL_LANG']['MSC']['skipped'];
+        $arrLanguageTags[Enum::FILESTATE_TOO_BIG_DELETE]  = $GLOBALS['TL_LANG']['MSC']['skipped'];
+        $arrLanguageTags[Enum::FILESTATE_BOMBASTIC_BIG]   = $GLOBALS['TL_LANG']['MSC']['ignored'];
+        $arrLanguageTags[Enum::FILESTATE_DBAFS_CONFLICT]  = $GLOBALS['TL_LANG']['MSC']['dbafs_conflict'];
 
         // Set template
         $this->Template                  = new BackendTemplate('be_syncCto_files');

@@ -9,6 +9,8 @@
  * @filesource
  */
 
+use SyncCto\Enum;
+
 /**
  * Class for file operations
  */
@@ -417,7 +419,7 @@ class SyncCtoFiles extends Backend
     {
         foreach($arrFileList as $key => $arrFile)
         {
-            if($arrFile['dbafs_state'] == SyncCtoEnum::DBAFS_DATA_CONFLICT)
+            if($arrFile['dbafs_state'] == Enum::DBAFS_DATA_CONFLICT)
             {
                 // Get the information from the tl_files.
                 $objModel       = \FilesModel::findByPath($arrFile['path']);
@@ -427,7 +429,7 @@ class SyncCtoFiles extends Backend
                 {
                     $arrFileList[$key]['saved']        = false;
                     $arrFileList[$key]['error']        = sprintf('Can not find the model for ' . $arrFile['path']);
-                    $arrFileList[$key]['transmission'] = SyncCtoEnum::FILETRANS_SKIPPED;
+                    $arrFileList[$key]['transmission'] = Enum::FILETRANS_SKIPPED;
                     $arrFileList[$key]['skipreason']   = sprintf($GLOBALS['TL_LANG']['ERR']['unknown_file'], $arrFile['path']);
                     continue;
                 }
@@ -438,7 +440,7 @@ class SyncCtoFiles extends Backend
                 // Add a status report for debugging and co.
                 $arrFileList[$key]['saved']           = true;
                 $arrFileList[$key]['dbafs']['msg']    = $GLOBALS['TL_LANG']['ERR']['dbafs_diff_data'];
-                $arrFileList[$key]['dbafs']['state']  = SyncCtoEnum::DBAFS_DATA_CONFLICT;
+                $arrFileList[$key]['dbafs']['state']  = Enum::DBAFS_DATA_CONFLICT;
             }
             else
             {
@@ -483,13 +485,13 @@ class SyncCtoFiles extends Backend
                     $arrFileList[$key]['dbafs']['msg']    = $GLOBALS['TL_LANG']['ERR']['dbafs_uuid_conflict'];
                     $arrFileList[$key]['dbafs']['error']  = sprintf($GLOBALS['TL_LANG']['ERR']['dbafs_uuid_conflict_rename'], $intFileNumber);
                     $arrFileList[$key]['dbafs']['rename'] = $strNewDestinationName;
-                    $arrFileList[$key]['dbafs']['state']  = SyncCtoEnum::DBAFS_CONFLICT;
+                    $arrFileList[$key]['dbafs']['state']  = Enum::DBAFS_CONFLICT;
                 }
                 else
                 {
                     $arrFileList[$key]['saved']        = false;
                     $arrFileList[$key]['error']        = sprintf('Can not move file - %s. Exception message: %s', $arrFile["path"], 'Unable to move.');
-                    $arrFileList[$key]['transmission'] = SyncCtoEnum::FILETRANS_SKIPPED;
+                    $arrFileList[$key]['transmission'] = Enum::FILETRANS_SKIPPED;
                     $arrFileList[$key]['skipreason']   = $GLOBALS['TL_LANG']['ERR']['cant_move_files'];
                 }
             }
@@ -536,8 +538,8 @@ class SyncCtoFiles extends Backend
                     "path"         => $strRelativePath,
                     "checksum"     => 0,
                     "size"         => -1,
-                    "state"        => SyncCtoEnum::FILESTATE_BOMBASTIC_BIG,
-                    "transmission" => SyncCtoEnum::FILETRANS_WAITING,
+                    "state"        => Enum::FILESTATE_BOMBASTIC_BIG,
+                    "transmission" => Enum::FILETRANS_WAITING,
                     "lastModified" => $intLasModified
                 );
             }
@@ -547,8 +549,8 @@ class SyncCtoFiles extends Backend
                     "path"         => $strRelativePath,
                     "checksum"     => 0,
                     "size"         => $intSize,
-                    "state"        => SyncCtoEnum::FILESTATE_BOMBASTIC_BIG,
-                    "transmission" => SyncCtoEnum::FILETRANS_WAITING,
+                    "state"        => Enum::FILESTATE_BOMBASTIC_BIG,
+                    "transmission" => Enum::FILETRANS_WAITING,
                     "lastModified" => $intLasModified
                 );
             }
@@ -558,8 +560,8 @@ class SyncCtoFiles extends Backend
                     "path"         => $strRelativePath,
                     "checksum"     => md5_file($strFullPath),
                     "size"         => $intSize,
-                    "state"        => SyncCtoEnum::FILESTATE_TOO_BIG,
-                    "transmission" => SyncCtoEnum::FILETRANS_WAITING,
+                    "state"        => Enum::FILESTATE_TOO_BIG,
+                    "transmission" => Enum::FILETRANS_WAITING,
                     "lastModified" => $intLasModified
                 );
             }
@@ -569,8 +571,8 @@ class SyncCtoFiles extends Backend
                     "path"         => $strRelativePath,
                     "checksum"     => md5_file($strFullPath),
                     "size"         => $intSize,
-                    "state"        => SyncCtoEnum::FILESTATE_FILE,
-                    "transmission" => SyncCtoEnum::FILETRANS_WAITING,
+                    "state"        => Enum::FILESTATE_FILE,
+                    "transmission" => Enum::FILETRANS_WAITING,
                     "lastModified" => $intLasModified
                 );
             }
@@ -606,8 +608,8 @@ class SyncCtoFiles extends Backend
                 "path"         => $strRelativePath,
                 "checksum"     => 0,
                 "size"         => 0,
-                "state"        => SyncCtoEnum::FILESTATE_FOLDER,
-                "transmission" => SyncCtoEnum::FILETRANS_WAITING,
+                "state"        => Enum::FILESTATE_FOLDER,
+                "transmission" => Enum::FILETRANS_WAITING,
             );
         }
 
@@ -623,7 +625,7 @@ class SyncCtoFiles extends Backend
      * @param boolean $booFiles Files scan
      * @return boolean 
      */
-    public function generateChecksumFileAsXML($strXMLFile, $booCore = false, $booFiles = false, $intInformations = SyncCtoEnum::FILEINFORMATION_SMALL)
+    public function generateChecksumFileAsXML($strXMLFile, $booCore = false, $booFiles = false, $intInformations = Enum::FILEINFORMATION_SMALL)
     {
         $strXMLFile = $this->objSyncCtoHelper->standardizePath($strXMLFile);
 
@@ -678,7 +680,7 @@ class SyncCtoFiles extends Backend
             }
             else
             {
-                if ($intInformations == SyncCtoEnum::FILEINFORMATION_SMALL)
+                if ($intInformations == Enum::FILEINFORMATION_SMALL)
                 {
                     $objXml->startElement('file');
                     $objXml->writeAttribute("id", md5($strRelativePath));
@@ -686,7 +688,7 @@ class SyncCtoFiles extends Backend
                     $objXml->text($strRelativePath);
                     $objXml->endElement(); // End file
                 }
-                else if ($intInformations == SyncCtoEnum::FILEINFORMATION_BIG)
+                else if ($intInformations == Enum::FILEINFORMATION_BIG)
                 {
                     $objXml->startElement('file');
                     $objXml->writeAttribute("id", md5($strRelativePath));
@@ -782,7 +784,7 @@ class SyncCtoFiles extends Backend
         foreach ($arrChecksumList as $key => $value)
         {
             // Check the files old school, md5 hash and co.
-            if ($value['state'] == SyncCtoEnum::FILESTATE_BOMBASTIC_BIG)
+            if ($value['state'] == Enum::FILESTATE_BOMBASTIC_BIG)
             {
                 $arrFileList[$key]        = $arrChecksumList[$key];
                 $arrFileList[$key]['raw'] = 'file bombastic';
@@ -795,29 +797,29 @@ class SyncCtoFiles extends Backend
                 }
                 else
                 {
-                    if ($value['state'] == SyncCtoEnum::FILESTATE_TOO_BIG)
+                    if ($value['state'] == Enum::FILESTATE_TOO_BIG)
                     {
                         $arrFileList[$key]          = $arrChecksumList[$key];
-                        $arrFileList[$key]['state'] = SyncCtoEnum::FILESTATE_TOO_BIG_NEED;
+                        $arrFileList[$key]['state'] = Enum::FILESTATE_TOO_BIG_NEED;
                     }
                     else
                     {
                         $arrFileList[$key]          = $arrChecksumList[$key];
-                        $arrFileList[$key]['state'] = SyncCtoEnum::FILESTATE_NEED;
+                        $arrFileList[$key]['state'] = Enum::FILESTATE_NEED;
                     }
                 }
             }
             else
             {
-                if ($value['state'] == SyncCtoEnum::FILESTATE_TOO_BIG)
+                if ($value['state'] == Enum::FILESTATE_TOO_BIG)
                 {
                     $arrFileList[$key]          = $arrChecksumList[$key];
-                    $arrFileList[$key]['state'] = SyncCtoEnum::FILESTATE_TOO_BIG_MISSING;
+                    $arrFileList[$key]['state'] = Enum::FILESTATE_TOO_BIG_MISSING;
                 }
                 else
                 {
                     $arrFileList[$key]          = $arrChecksumList[$key];
-                    $arrFileList[$key]['state'] = SyncCtoEnum::FILESTATE_MISSING;
+                    $arrFileList[$key]['state'] = Enum::FILESTATE_MISSING;
                 }
             }
 
@@ -836,17 +838,17 @@ class SyncCtoFiles extends Backend
                         if (!isset($arrFileList[$key]))
                         {
                             $arrFileList[$key]          = $arrChecksumList[$key];
-                            $arrFileList[$key]['state'] = SyncCtoEnum::FILESTATE_DBAFS_CONFLICT;
+                            $arrFileList[$key]['state'] = Enum::FILESTATE_DBAFS_CONFLICT;
                         }
 
-                        $arrFileList[$key]['dbafs_state'] = SyncCtoEnum::DBAFS_CONFLICT;
+                        $arrFileList[$key]['dbafs_state'] = Enum::DBAFS_CONFLICT;
                     }
                     // Second check the meta
                     elseif ($arrLocaleDBAFSInformation['meta'] != $value['tl_files']['meta'])
                     {
                         $arrFileList[$key]          = $arrChecksumList[$key];
-                        $arrFileList[$key]['state']       = SyncCtoEnum::FILESTATE_DBAFS_CONFLICT;
-                        $arrFileList[$key]['dbafs_state'] = SyncCtoEnum::DBAFS_DATA_CONFLICT;
+                        $arrFileList[$key]['state']       = Enum::FILESTATE_DBAFS_CONFLICT;
+                        $arrFileList[$key]['dbafs_state'] = Enum::DBAFS_DATA_CONFLICT;
                     }
 
                     // And than the tails.
@@ -856,10 +858,10 @@ class SyncCtoFiles extends Backend
 //                        if (!isset($arrFileList[$key]))
 //                        {
 //                            $arrFileList[$key]          = $arrChecksumList[$key];
-//                            $arrFileList[$key]['state'] = SyncCtoEnum::FILESTATE_DBAFS_CONFLICT;
+//                            $arrFileList[$key]['state'] = Enum::FILESTATE_DBAFS_CONFLICT;
 //                        }
 //
-//                        $arrFileList[$key]['dbafs_tail_state'] = SyncCtoEnum::DBAFS_CONFLICT;
+//                        $arrFileList[$key]['dbafs_tail_state'] = Enum::DBAFS_CONFLICT;
 //                        $arrFileList[$key]['dbafs_tail_data']  = $arrDiff;
 //                    }
                 }
@@ -885,7 +887,7 @@ class SyncCtoFiles extends Backend
             if (!file_exists(TL_ROOT . "/" . $valueItem["path"]))
             {
                 $arrFolderList[$keyItem]          = $valueItem;
-                $arrFolderList[$keyItem]["state"] = SyncCtoEnum::FILESTATE_FOLDER_DELETE;
+                $arrFolderList[$keyItem]["state"] = Enum::FILESTATE_FOLDER_DELETE;
                 $arrFolderList[$keyItem]["css"]   = "deleted";
             }
         }
@@ -907,7 +909,7 @@ class SyncCtoFiles extends Backend
             if (!file_exists(TL_ROOT . "/" . $valueItem["path"]))
             {
                 $arrReturn[$keyItem]          = $valueItem;
-                $arrReturn[$keyItem]["state"] = SyncCtoEnum::FILESTATE_DELETE;
+                $arrReturn[$keyItem]["state"] = Enum::FILESTATE_DELETE;
                 $arrReturn[$keyItem]["css"]   = "deleted";
             }
         }
@@ -1711,7 +1713,7 @@ class SyncCtoFiles extends Backend
 
                             // Add a status report for debugging and co.
                             $arrFileList[$key]['dbafs']['msg']   = 'Moved file and add to database.';
-                            $arrFileList[$key]['dbafs']['state'] = SyncCtoEnum::DBAFS_CREATE;
+                            $arrFileList[$key]['dbafs']['state'] = Enum::DBAFS_CREATE;
                         }
                     }
                     else
@@ -1734,7 +1736,7 @@ class SyncCtoFiles extends Backend
 
                                 // Add a status report for debugging and co.
                                 $arrFileList[$key]['dbafs']['msg']   = 'UUID same no problem found. Update database with new hash.';
-                                $arrFileList[$key]['dbafs']['state'] = SyncCtoEnum::DBAFS_SAME;
+                                $arrFileList[$key]['dbafs']['state'] = Enum::DBAFS_SAME;
                             }
                         }
                         // Not same so we have to rearrange the files.
@@ -1782,7 +1784,7 @@ class SyncCtoFiles extends Backend
                                 $arrFileList[$key]['dbafs']['msg']    = $GLOBALS['TL_LANG']['ERR']['dbafs_uuid_conflict'];
                                 $arrFileList[$key]['dbafs']['error']  = sprintf($GLOBALS['TL_LANG']['ERR']['dbafs_uuid_conflict_rename'], $intFileNumber);
                                 $arrFileList[$key]['dbafs']['rename'] = $strNewDestinationName;
-                                $arrFileList[$key]['dbafs']['state']  = SyncCtoEnum::DBAFS_CONFLICT;
+                                $arrFileList[$key]['dbafs']['state']  = Enum::DBAFS_CONFLICT;
                             }
                         }
                     }
@@ -1801,7 +1803,7 @@ class SyncCtoFiles extends Backend
                 {
                     $arrFileList[$key]['saved']        = false;
                     $arrFileList[$key]['error']        = sprintf($GLOBALS['TL_LANG']['ERR']['cant_move_file'], $strFileSource, $strFileDestination);
-                    $arrFileList[$key]['transmission'] = SyncCtoEnum::FILETRANS_SKIPPED;
+                    $arrFileList[$key]['transmission'] = Enum::FILETRANS_SKIPPED;
                     $arrFileList[$key]['skipreason']   = $GLOBALS['TL_LANG']['ERR']['cant_move_files'];
                 }
             }
@@ -1809,7 +1811,7 @@ class SyncCtoFiles extends Backend
             {
                 $arrFileList[$key]['saved']        = false;
                 $arrFileList[$key]['error']        = sprintf('Can not move file - %s. Exception message: %s', $value["path"], $e->getMessage());
-                $arrFileList[$key]['transmission'] = SyncCtoEnum::FILETRANS_SKIPPED;
+                $arrFileList[$key]['transmission'] = Enum::FILETRANS_SKIPPED;
                 $arrFileList[$key]['skipreason']   = $GLOBALS['TL_LANG']['ERR']['cant_move_files'];
             }
         }
@@ -1839,7 +1841,7 @@ class SyncCtoFiles extends Backend
                 {
                     if (!file_exists(TL_ROOT . "/" . $value['path']))
                     {
-                        $arrFileList[$key]['transmission'] = SyncCtoEnum::FILETRANS_SEND;
+                        $arrFileList[$key]['transmission'] = Enum::FILETRANS_SEND;
 
                         // Remove from dbafs.
                         if ($blnIsDbafs)
@@ -1853,7 +1855,7 @@ class SyncCtoFiles extends Backend
                         // Delete the file.
                         if ($this->objFiles->delete($value['path']))
                         {
-                            $arrFileList[$key]['transmission'] = SyncCtoEnum::FILETRANS_SEND;
+                            $arrFileList[$key]['transmission'] = Enum::FILETRANS_SEND;
 
                             // Remove from dbafs.
                             if ($blnIsDbafs)
@@ -1864,7 +1866,7 @@ class SyncCtoFiles extends Backend
                         // If not possible add a msg.
                         else
                         {
-                            $arrFileList[$key]['transmission'] = SyncCtoEnum::FILETRANS_SKIPPED;
+                            $arrFileList[$key]['transmission'] = Enum::FILETRANS_SKIPPED;
                             $arrFileList[$key]['error']        = $GLOBALS['TL_LANG']['ERR']['cant_delete_file'];
                             $arrFileList[$key]['skipreason']   = $GLOBALS['TL_LANG']['ERR']['cant_delete_file'];
                         }
@@ -1874,7 +1876,7 @@ class SyncCtoFiles extends Backend
                     elseif (is_dir(TL_ROOT . "/" . $value['path']))
                     {
                         $this->objFiles->rrdir($value['path']);
-                        $arrFileList[$key]['transmission'] = SyncCtoEnum::FILETRANS_SEND;
+                        $arrFileList[$key]['transmission'] = Enum::FILETRANS_SEND;
 
                         // Remove from dbafs.
                         if ($blnIsDbafs)
@@ -1885,7 +1887,7 @@ class SyncCtoFiles extends Backend
                 }
                 catch (Exception $exc)
                 {
-                    $arrFileList[$key]['transmission'] = SyncCtoEnum::FILETRANS_SKIPPED;
+                    $arrFileList[$key]['transmission'] = Enum::FILETRANS_SKIPPED;
                     $arrFileList[$key]['error']        = sprintf('Can not delete file - %s. Exception message: %s', $value["path"], $exc->getMessage());
                     $arrFileList[$key]['skipreason']   = $GLOBALS['TL_LANG']['ERR']['cant_delete_file'];
                 }
@@ -1924,19 +1926,19 @@ class SyncCtoFiles extends Backend
 
             switch ($arrMetafiles[$key]["typ"])
             {
-                case SyncCtoEnum::UPLOAD_TEMP:
+                case Enum::UPLOAD_TEMP:
                     $strSaveFile = $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], $strFolder, $strFile);
                     break;
 
-                case SyncCtoEnum::UPLOAD_SYNC_TEMP:
+                case Enum::UPLOAD_SYNC_TEMP:
                     $strSaveFile = $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "sync", $strFolder, $strFile);
                     break;
 
-                case SyncCtoEnum::UPLOAD_SQL_TEMP:
+                case Enum::UPLOAD_SQL_TEMP:
                     $strSaveFile = $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "sql", $strFile);
                     break;
 
-                case SyncCtoEnum::UPLOAD_SYNC_SPLIT:
+                case Enum::UPLOAD_SYNC_SPLIT:
                     $strSaveFile = $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], $arrMetafiles[$key]["splitname"], $strFile);
                     break;
 

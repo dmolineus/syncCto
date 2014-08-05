@@ -9,6 +9,8 @@
  * @filesource
  */
 
+use SyncCto\Enum;
+
 /**
  * Class for client interaction
  */
@@ -1201,7 +1203,7 @@ class SyncCtoModuleClient extends BackendModule
         // Set content back to normale mode
         $this->strError = "";
         $this->booError = false;
-        $this->objData->setState(SyncCtoEnum::WORK_WORK);
+        $this->objData->setState(Enum::WORK_WORK);
 
         try
         {
@@ -1213,7 +1215,7 @@ class SyncCtoModuleClient extends BackendModule
                 case 1:
                     $this->objData->setTitle($GLOBALS['TL_LANG']['MSC']['step'] . " %s");
                     $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_1_show"]['description_1']);
-                    $this->objData->setState(SyncCtoEnum::WORK_WORK);
+                    $this->objData->setState(Enum::WORK_WORK);
 
                     $this->objStepPool->step++;
                     break;
@@ -1233,7 +1235,7 @@ class SyncCtoModuleClient extends BackendModule
                 case 3:
                     if (!$this->objSyncCtoCommunicationClient->referrerDisable())
                     {
-                        $this->objData->setState(SyncCtoEnum::WORK_ERROR);
+                        $this->objData->setState(Enum::WORK_ERROR);
                         $this->booError = true;
                         $this->strError = $GLOBALS['TL_LANG']['ERR']['referer'];
 
@@ -1269,7 +1271,7 @@ class SyncCtoModuleClient extends BackendModule
                     $objCheckTemplate->syc_version              = $strVersion;
 
                     // Show information
-                    $this->objData->setState(SyncCtoEnum::WORK_OK);
+                    $this->objData->setState(Enum::WORK_OK);
                     $this->objData->setHtml($objCheckTemplate->parse());
 
                     $this->booFinished           = true;
@@ -1279,7 +1281,7 @@ class SyncCtoModuleClient extends BackendModule
                     $this->objStepPool->step++;
 
                 case 4:
-                    $this->objData->setState(SyncCtoEnum::WORK_OK);
+                    $this->objData->setState(Enum::WORK_OK);
                     $this->booFinished           = true;
                     $this->booRefresh            = false;
                     $this->Template->showControl = false;
@@ -1293,7 +1295,7 @@ class SyncCtoModuleClient extends BackendModule
             $this->booError = true;
             $this->strError = $exc->getMessage();
 
-            $this->objData->setState(SyncCtoEnum::WORK_ERROR);
+            $this->objData->setState(Enum::WORK_ERROR);
         }
 
         // Save step pool for current step
@@ -1318,7 +1320,7 @@ class SyncCtoModuleClient extends BackendModule
         // Set content back to normale mode
         $this->strError = "";
         $this->booError = false;
-        $this->objData->setState(SyncCtoEnum::WORK_WORK);
+        $this->objData->setState(Enum::WORK_WORK);
 
         /* ---------------------------------------------------------------------
          * Run page
@@ -1334,7 +1336,7 @@ class SyncCtoModuleClient extends BackendModule
                 case 1:
                     $this->objData->setTitle($GLOBALS['TL_LANG']['MSC']['step'] . " %s");
                     $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_1"]['description_1']);
-                    $this->objData->setState(SyncCtoEnum::WORK_WORK);
+                    $this->objData->setState(Enum::WORK_WORK);
 
                     $this->objStepPool->step++;
                     break;
@@ -1354,7 +1356,7 @@ class SyncCtoModuleClient extends BackendModule
                 case 3:
                     if (!$this->objSyncCtoCommunicationClient->referrerDisable())
                     {
-                        $this->objData->setState(SyncCtoEnum::WORK_ERROR);
+                        $this->objData->setState(Enum::WORK_ERROR);
                         $this->booError = true;
                         $this->strError = $GLOBALS['TL_LANG']['ERR']['referer'];
 
@@ -1402,7 +1404,7 @@ class SyncCtoModuleClient extends BackendModule
                     {
                         $this->log(vsprintf("Not the same version from contao on synchronization client ID %s. Serverversion: %s. Clientversion: %s", array($this->Input->get("id"), $GLOBALS['SYC_VERSION'], $strVersion)), __CLASS__ . " " . __FUNCTION__, "GENERAL");
 
-                        $this->objData->setState(SyncCtoEnum::WORK_ERROR);
+                        $this->objData->setState(Enum::WORK_ERROR);
                         $this->booError = true;
                         $this->strError = vsprintf($GLOBALS['TL_LANG']['ERR']['version'], array("Contao", $strCurrentVersion, $strVersion));
                         break;
@@ -1443,7 +1445,7 @@ class SyncCtoModuleClient extends BackendModule
                     // Check if everything is okay
                     if ($arrClientParameter['file_uploads'] != 1)
                     {
-                        $this->objData->setState(SyncCtoEnum::WORK_ERROR);
+                        $this->objData->setState(Enum::WORK_ERROR);
                         $this->booError = true;
                         $this->strError = $GLOBALS['TL_LANG']['ERR']['upload_ini'];
 
@@ -1524,7 +1526,7 @@ class SyncCtoModuleClient extends BackendModule
 
                     foreach ($arrFiles as $value)
                     {
-                        $this->objSyncCtoCommunicationClient->sendFile(dirname($value), basename($value), "", SyncCtoEnum::UPLOAD_SYNC_TEMP);
+                        $this->objSyncCtoCommunicationClient->sendFile(dirname($value), basename($value), "", Enum::UPLOAD_SYNC_TEMP);
                     }
 
                     $this->objStepPool->step++;
@@ -1550,8 +1552,8 @@ class SyncCtoModuleClient extends BackendModule
                             "path"         => $value,
                             "checksum"     => $strChecksum,
                             "size"         => 0,
-                            "state"        => SyncCtoEnum::FILESTATE_FILE,
-                            "transmission" => SyncCtoEnum::FILETRANS_WAITING,
+                            "state"        => Enum::FILESTATE_FILE,
+                            "transmission" => Enum::FILETRANS_WAITING,
                         );
                     }
 
@@ -1575,7 +1577,7 @@ class SyncCtoModuleClient extends BackendModule
 
                 case 12:
                     $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_1"]['description_1']);
-                    $this->objData->setState(SyncCtoEnum::WORK_OK);
+                    $this->objData->setState(Enum::WORK_OK);
                     $this->intStep++;
                     break;
             }
@@ -1587,7 +1589,7 @@ class SyncCtoModuleClient extends BackendModule
             $this->booError = true;
             $this->strError = $exc->getMessage();
 
-            $this->objData->setState(SyncCtoEnum::WORK_ERROR);
+            $this->objData->setState(Enum::WORK_ERROR);
         }
     }
 
@@ -1632,14 +1634,14 @@ class SyncCtoModuleClient extends BackendModule
             $this->intStep = 99;
 
             // Set last to skipped        
-            $this->objData->setState(SyncCtoEnum::WORK_SKIPPED);
+            $this->objData->setState(Enum::WORK_SKIPPED);
             $this->objData->setHtml("");
 
             // Set Abort information 
             $this->objData->setStep(99);
             $this->objData->setTitle($GLOBALS['TL_LANG']['MSC']['abort']);
             $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']['abort']);
-            $this->objData->setState(SyncCtoEnum::WORK_ERROR);
+            $this->objData->setState(Enum::WORK_ERROR);
         }
     }
 
@@ -1681,7 +1683,7 @@ class SyncCtoModuleClient extends BackendModule
         // Set content back to normale mode
         $this->booError = false;
         $this->strError = "";
-        $this->objData->setState(SyncCtoEnum::WORK_WORK);
+        $this->objData->setState(Enum::WORK_WORK);
 
         // Run page
         try
@@ -1692,7 +1694,7 @@ class SyncCtoModuleClient extends BackendModule
                  * Show step
                  */
                 case 1:
-                    $this->objData->setState(SyncCtoEnum::WORK_WORK);
+                    $this->objData->setState(Enum::WORK_WORK);
                     $this->objData->setTitle($GLOBALS['TL_LANG']['MSC']['step'] . " %s");
                     $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_1']);
                     $this->objStepPool->step++;
@@ -1814,28 +1816,28 @@ class SyncCtoModuleClient extends BackendModule
                         {
                             switch ($value["state"])
                             {
-                                case SyncCtoEnum::FILESTATE_BOMBASTIC_BIG:
+                                case Enum::FILESTATE_BOMBASTIC_BIG:
                                     $this->arrListCompare[$strType][$key]["css"]     = "unknown";
                                     $this->arrListCompare[$strType][$key]["css_big"] = "ignored";
                                     break;
 
-                                case SyncCtoEnum::FILESTATE_TOO_BIG_NEED:
+                                case Enum::FILESTATE_TOO_BIG_NEED:
                                     $this->arrListCompare[$strType][$key]["css_big"] = "ignored";
-                                case SyncCtoEnum::FILESTATE_NEED:
+                                case Enum::FILESTATE_NEED:
                                     $this->arrListCompare[$strType][$key]["css"] = "modified";
                                     break;
 
-                                case SyncCtoEnum::FILESTATE_TOO_BIG_MISSING:
+                                case Enum::FILESTATE_TOO_BIG_MISSING:
                                     $this->arrListCompare[$strType][$key]["css_big"] = "ignored";
-                                case SyncCtoEnum::FILESTATE_MISSING:
+                                case Enum::FILESTATE_MISSING:
                                     $this->arrListCompare[$strType][$key]["css"] = "new";
                                     break;
 
-                                case SyncCtoEnum::FILESTATE_DELETE:
+                                case Enum::FILESTATE_DELETE:
                                     $this->arrListCompare[$strType][$key]["css"] = "deleted";
                                     break;
 
-                                case SyncCtoEnum::FILESTATE_DBAFS_CONFLICT:
+                                case Enum::FILESTATE_DBAFS_CONFLICT:
                                     $this->arrListCompare[$strType][$key]["css"] = "conflict";
                                     break;
 
@@ -1844,17 +1846,17 @@ class SyncCtoModuleClient extends BackendModule
                                     break;
                             }
 
-                            if($value["state"] != SyncCtoEnum::FILESTATE_DBAFS_CONFLICT && (isset($value["dbafs_state"]) || isset($value["dbafs_tail_state"])))
+                            if($value["state"] != Enum::FILESTATE_DBAFS_CONFLICT && (isset($value["dbafs_state"]) || isset($value["dbafs_tail_state"])))
                             {
                                 $this->arrListCompare[$strType][$key]["css"] .= " conflict";
                             }
 
-                            if ($value["state"] == SyncCtoEnum::FILESTATE_TOO_BIG_DELETE
-                                || $value["state"] == SyncCtoEnum::FILESTATE_TOO_BIG_MISSING
-                                || $value["state"] == SyncCtoEnum::FILESTATE_TOO_BIG_NEED
-                                || $value["state"] == SyncCtoEnum::FILESTATE_TOO_BIG_SAME
-                                || $value["state"] == SyncCtoEnum::FILESTATE_BOMBASTIC_BIG
-                                || $value["state"] == SyncCtoEnum::FILESTATE_DELETE
+                            if ($value["state"] == Enum::FILESTATE_TOO_BIG_DELETE
+                                || $value["state"] == Enum::FILESTATE_TOO_BIG_MISSING
+                                || $value["state"] == Enum::FILESTATE_TOO_BIG_NEED
+                                || $value["state"] == Enum::FILESTATE_TOO_BIG_SAME
+                                || $value["state"] == Enum::FILESTATE_BOMBASTIC_BIG
+                                || $value["state"] == Enum::FILESTATE_DELETE
                             )
                             {
                                 continue;
@@ -1894,31 +1896,31 @@ class SyncCtoModuleClient extends BackendModule
                         {
                             switch ($value['state'])
                             {
-                                case SyncCtoEnum::FILESTATE_MISSING:
+                                case Enum::FILESTATE_MISSING:
                                     $intCountMissing++;
                                     $intTotalSizeNew += $value["size"];
                                     break;
 
-                                case SyncCtoEnum::FILESTATE_NEED:
+                                case Enum::FILESTATE_NEED:
                                     $intCountNeed++;
                                     $intTotalSizeChange += $value["size"];
                                     break;
 
-                                case SyncCtoEnum::FILESTATE_DELETE:
-                                case SyncCtoEnum::FILESTATE_FOLDER_DELETE:
+                                case Enum::FILESTATE_DELETE:
+                                case Enum::FILESTATE_FOLDER_DELETE:
                                     $intCountDelete++;
                                     $intTotalSizeDel += $value["size"];
                                     break;
 
-                                case SyncCtoEnum::FILESTATE_BOMBASTIC_BIG:
-                                case SyncCtoEnum::FILESTATE_TOO_BIG_NEED:
-                                case SyncCtoEnum::FILESTATE_TOO_BIG_MISSING:
-                                case SyncCtoEnum::FILESTATE_TOO_BIG_DELETE :
+                                case Enum::FILESTATE_BOMBASTIC_BIG:
+                                case Enum::FILESTATE_TOO_BIG_NEED:
+                                case Enum::FILESTATE_TOO_BIG_MISSING:
+                                case Enum::FILESTATE_TOO_BIG_DELETE :
                                     $intCountIgnored++;
                                     break;
                             }
 
-                            if($value["state"] == SyncCtoEnum::FILESTATE_DBAFS_CONFLICT
+                            if($value["state"] == Enum::FILESTATE_DBAFS_CONFLICT
                                 || isset($value["dbafs_state"])
                                 || isset($value["dbafs_tail_state"])
                             )
@@ -1938,7 +1940,7 @@ class SyncCtoModuleClient extends BackendModule
                     if ($intCountMissing == 0 && $intCountNeed == 0 && $intCountIgnored == 0 && $intCountDelete == 0 && $intCountDbafsConflict == 0)
                     {
                         // Set current step informations
-                        $this->objData->setState(SyncCtoEnum::WORK_SKIPPED);
+                        $this->objData->setState(Enum::WORK_SKIPPED);
                         $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_1']);
                         $this->objData->setHtml("");
                         $this->booRefresh = true;
@@ -1950,7 +1952,7 @@ class SyncCtoModuleClient extends BackendModule
                     {
                         if (count($this->arrListCompare) == 0 || array_key_exists("skip", $_POST))
                         {
-                            $this->objData->setState(SyncCtoEnum::WORK_SKIPPED);
+                            $this->objData->setState(Enum::WORK_SKIPPED);
                             $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_1']);
                             $this->objData->setHtml("");
                             $this->booRefresh = true;
@@ -1964,7 +1966,7 @@ class SyncCtoModuleClient extends BackendModule
                         {
                             if (($this->arrSyncSettings["automode"] || array_key_exists("forward", $_POST)) && count($this->arrListCompare) != 0)
                             {
-                                $this->objData->setState(SyncCtoEnum::WORK_OK);
+                                $this->objData->setState(Enum::WORK_OK);
                                 $this->objData->setDescription(vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_4'], array($intCountMissing, $intCountNeed, $intCountDelete, $intCountIgnored, $this->getReadableSize($intTotalSizeNew), $this->getReadableSize($intTotalSizeChange), $this->getReadableSize($intTotalSizeDel))));
                                 $this->objData->setHtml("");
                                 $this->booRefresh = true;
@@ -2000,7 +2002,7 @@ class SyncCtoModuleClient extends BackendModule
             $objErrTemplate              = new BackendTemplate('be_syncCto_error');
             $objErrTemplate->strErrorMsg = $exc->getMessage();
 
-            $this->objData->setState(SyncCtoEnum::WORK_SKIPPED);
+            $this->objData->setState(Enum::WORK_SKIPPED);
             $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_1']);
             $this->objData->setHtml($objErrTemplate->parse());
             $this->booRefresh = true;
@@ -2024,7 +2026,7 @@ class SyncCtoModuleClient extends BackendModule
         // Set content back to normale mode
         $this->booError = false;
         $this->strError = "";
-        $this->objData->setState(SyncCtoEnum::WORK_WORK);
+        $this->objData->setState(Enum::WORK_WORK);
 
         // Count files
         if (is_array($this->arrListCompare) && (count($this->arrListCompare['core']) != 0 || count($this->arrListCompare['files']) != 0))
@@ -2039,27 +2041,27 @@ class SyncCtoModuleClient extends BackendModule
             {
                 foreach ($arrLists as $key => $value)
                 {
-                    if($value['state'] == SyncCtoEnum::FILESTATE_DBAFS_CONFLICT)
+                    if($value['state'] == Enum::FILESTATE_DBAFS_CONFLICT)
                     {
                         continue;
                     }
 
                     switch ($value["transmission"])
                     {
-                        case SyncCtoEnum::FILETRANS_SEND:
+                        case Enum::FILETRANS_SEND:
                             $intSendCount++;
                             break;
 
-                        case SyncCtoEnum::FILETRANS_SKIPPED:
+                        case Enum::FILETRANS_SKIPPED:
                             $intSkippCount++;
                             break;
 
-                        case SyncCtoEnum::FILETRANS_WAITING:
+                        case Enum::FILETRANS_WAITING:
                             $intWaitCount++;
                             break;
                     }
 
-                    if ($value["state"] == SyncCtoEnum::FILESTATE_DELETE || $value["state"] == SyncCtoEnum::FILESTATE_FOLDER_DELETE)
+                    if ($value["state"] == Enum::FILESTATE_DELETE || $value["state"] == Enum::FILESTATE_FOLDER_DELETE)
                     {
                         $intDelCount++;
                     }
@@ -2083,7 +2085,7 @@ class SyncCtoModuleClient extends BackendModule
                  * Show step
                  */
                 case 1:
-                    $this->objData->setState(SyncCtoEnum::WORK_WORK);
+                    $this->objData->setState(Enum::WORK_WORK);
                     $this->objData->setTitle($GLOBALS['TL_LANG']['MSC']['step'] . " %s");
                     $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_3"]['description_1']);
 
@@ -2101,12 +2103,12 @@ class SyncCtoModuleClient extends BackendModule
                     {
                         foreach ($arrLists as $key => $value)
                         {
-                            if ($value["transmission"] == SyncCtoEnum::FILETRANS_SEND || $value["transmission"] == SyncCtoEnum::FILETRANS_SKIPPED)
+                            if ($value["transmission"] == Enum::FILETRANS_SEND || $value["transmission"] == Enum::FILETRANS_SKIPPED)
                             {
                                 continue;
                             }
 
-                            if (in_array($value["state"], array(SyncCtoEnum::FILESTATE_DELETE, SyncCtoEnum::FILESTATE_FOLDER_DELETE, SyncCtoEnum::FILESTATE_DBAFS_CONFLICT)))
+                            if (in_array($value["state"], array(Enum::FILESTATE_DELETE, Enum::FILESTATE_FOLDER_DELETE, Enum::FILESTATE_DBAFS_CONFLICT)))
                             {
                                 continue;
                             }
@@ -2121,15 +2123,15 @@ class SyncCtoModuleClient extends BackendModule
                                 continue;
                             }
 
-                            if ($value["state"] == SyncCtoEnum::FILESTATE_TOO_BIG
-                                || $value["state"] == SyncCtoEnum::FILESTATE_TOO_BIG_DELETE
-                                || $value["state"] == SyncCtoEnum::FILESTATE_TOO_BIG_NEED
-                                || $value["state"] == SyncCtoEnum::FILESTATE_TOO_BIG_MISSING
-                                || $value["state"] == SyncCtoEnum::FILESTATE_BOMBASTIC_BIG
+                            if ($value["state"] == Enum::FILESTATE_TOO_BIG
+                                || $value["state"] == Enum::FILESTATE_TOO_BIG_DELETE
+                                || $value["state"] == Enum::FILESTATE_TOO_BIG_NEED
+                                || $value["state"] == Enum::FILESTATE_TOO_BIG_MISSING
+                                || $value["state"] == Enum::FILESTATE_BOMBASTIC_BIG
                             )
                             {
                                 $this->arrListCompare[$strType][$key]["skipreason"]   = $GLOBALS['TL_LANG']['ERR']['maximum_filesize'];
-                                $this->arrListCompare[$strType][$key]["transmission"] = SyncCtoEnum::FILETRANS_SKIPPED;
+                                $this->arrListCompare[$strType][$key]["transmission"] = Enum::FILETRANS_SKIPPED;
 
                                 continue;
                             }
@@ -2137,12 +2139,12 @@ class SyncCtoModuleClient extends BackendModule
                             try
                             {
                                 // Send files
-                                $this->objSyncCtoCommunicationClient->sendFile(dirname($value["path"]), str_replace(dirname($value["path"]) . "/", "", $value["path"]), $value["checksum"], SyncCtoEnum::UPLOAD_SYNC_TEMP);
-                                $this->arrListCompare[$strType][$key]["transmission"] = SyncCtoEnum::FILETRANS_SEND;
+                                $this->objSyncCtoCommunicationClient->sendFile(dirname($value["path"]), str_replace(dirname($value["path"]) . "/", "", $value["path"]), $value["checksum"], Enum::UPLOAD_SYNC_TEMP);
+                                $this->arrListCompare[$strType][$key]["transmission"] = Enum::FILETRANS_SEND;
                             }
                             catch (Exception $exc)
                             {
-                                $this->arrListCompare[$strType][$key]["transmission"] = SyncCtoEnum::FILETRANS_SKIPPED;
+                                $this->arrListCompare[$strType][$key]["transmission"] = Enum::FILETRANS_SKIPPED;
                                 $this->arrListCompare[$strType][$key]["skipreason"]   = $exc->getMessage();
                             }
 
@@ -2175,7 +2177,7 @@ class SyncCtoModuleClient extends BackendModule
                         }
 
                         $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_3"]['description_1']);
-                        $this->objData->setState(SyncCtoEnum::WORK_OK);
+                        $this->objData->setState(Enum::WORK_OK);
                         $this->intStep++;
                     }
 
@@ -2192,7 +2194,7 @@ class SyncCtoModuleClient extends BackendModule
                     {
                         foreach ($arrLists as $key => $value)
                         {
-                            if($value['state'] == SyncCtoEnum::FILESTATE_DBAFS_CONFLICT)
+                            if($value['state'] == Enum::FILESTATE_DBAFS_CONFLICT)
                             {
                                 continue;
                             }
@@ -2213,7 +2215,7 @@ class SyncCtoModuleClient extends BackendModule
                                 continue;
                             }
 
-                            if($value['state'] == SyncCtoEnum::FILESTATE_DBAFS_CONFLICT)
+                            if($value['state'] == Enum::FILESTATE_DBAFS_CONFLICT)
                             {
                                 continue;
                             }
@@ -2241,7 +2243,7 @@ class SyncCtoModuleClient extends BackendModule
                     else
                     {
                         $this->objStepPool->step++;
-                        $this->objData->setState(SyncCtoEnum::WORK_WORK);
+                        $this->objData->setState(Enum::WORK_WORK);
                         $this->objData->setDescription(vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_3"]['description_4'], array($intCount, $intCountSplit)));
                     }
 
@@ -2258,7 +2260,7 @@ class SyncCtoModuleClient extends BackendModule
                     {
                         foreach ($arrLists as $key => $value)
                         {
-                            if($value['state'] == SyncCtoEnum::FILESTATE_DBAFS_CONFLICT)
+                            if($value['state'] == Enum::FILESTATE_DBAFS_CONFLICT)
                             {
                                 continue;
                             }
@@ -2281,14 +2283,14 @@ class SyncCtoModuleClient extends BackendModule
 
                             if (in_array($value["state"],
                                 array(
-                                    SyncCtoEnum::FILESTATE_TOO_BIG_DELETE,
-                                    SyncCtoEnum::FILESTATE_TOO_BIG_MISSING,
-                                    SyncCtoEnum::FILESTATE_TOO_BIG_NEED,
-                                    SyncCtoEnum::FILESTATE_TOO_BIG_SAME,
-                                    SyncCtoEnum::FILESTATE_BOMBASTIC_BIG,
-                                    SyncCtoEnum::FILESTATE_DELETE,
-                                    SyncCtoEnum::FILESTATE_FOLDER_DELETE,
-                                    SyncCtoEnum::FILESTATE_DBAFS_CONFLICT
+                                    Enum::FILESTATE_TOO_BIG_DELETE,
+                                    Enum::FILESTATE_TOO_BIG_MISSING,
+                                    Enum::FILESTATE_TOO_BIG_NEED,
+                                    Enum::FILESTATE_TOO_BIG_SAME,
+                                    Enum::FILESTATE_BOMBASTIC_BIG,
+                                    Enum::FILESTATE_DELETE,
+                                    Enum::FILESTATE_FOLDER_DELETE,
+                                    Enum::FILESTATE_DBAFS_CONFLICT
                                 ))
                             )
                             {
@@ -2312,7 +2314,7 @@ class SyncCtoModuleClient extends BackendModule
                                 set_time_limit(7200);
 
                                 // Send file to client
-                                $arrResponse = $this->objSyncCtoCommunicationClient->sendFile($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], $key), $value["splitname"] . ".sync" . $ii, "", SyncCtoEnum::UPLOAD_SYNC_SPLIT, $value["splitname"]);
+                                $arrResponse = $this->objSyncCtoCommunicationClient->sendFile($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], $key), $value["splitname"] . ".sync" . $ii, "", Enum::UPLOAD_SYNC_SPLIT, $value["splitname"]);
 
                                 $this->arrListCompare[$strType][$key]["split_transfer"] = $ii + 1;
 
@@ -2334,7 +2336,7 @@ class SyncCtoModuleClient extends BackendModule
                     else
                     {
                         $this->objStepPool->step++;
-                        $this->objData->setState(SyncCtoEnum::WORK_WORK);
+                        $this->objData->setState(Enum::WORK_WORK);
                         $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_3"]['description_5']);
                     }
 
@@ -2351,7 +2353,7 @@ class SyncCtoModuleClient extends BackendModule
                     {
                         foreach ($arrLists as $key => $value)
                         {
-                            if($value['state'] == SyncCtoEnum::FILESTATE_DBAFS_CONFLICT)
+                            if($value['state'] == Enum::FILESTATE_DBAFS_CONFLICT)
                             {
                                 continue;
                             }
@@ -2373,21 +2375,21 @@ class SyncCtoModuleClient extends BackendModule
                             }
 
                             if (in_array($value["state"], array(
-                                SyncCtoEnum::FILESTATE_TOO_BIG_DELETE,
-                                SyncCtoEnum::FILESTATE_TOO_BIG_MISSING,
-                                SyncCtoEnum::FILESTATE_TOO_BIG_NEED,
-                                SyncCtoEnum::FILESTATE_TOO_BIG_SAME,
-                                SyncCtoEnum::FILESTATE_BOMBASTIC_BIG,
-                                SyncCtoEnum::FILESTATE_DELETE,
-                                SyncCtoEnum::FILESTATE_FOLDER_DELETE,
-                                SyncCtoEnum::FILESTATE_DBAFS_CONFLICT
+                                Enum::FILESTATE_TOO_BIG_DELETE,
+                                Enum::FILESTATE_TOO_BIG_MISSING,
+                                Enum::FILESTATE_TOO_BIG_NEED,
+                                Enum::FILESTATE_TOO_BIG_SAME,
+                                Enum::FILESTATE_BOMBASTIC_BIG,
+                                Enum::FILESTATE_DELETE,
+                                Enum::FILESTATE_FOLDER_DELETE,
+                                Enum::FILESTATE_DBAFS_CONFLICT
                             ))
                             )
                             {
                                 continue;
                             }
 
-                            if ($value["transmission"] == SyncCtoEnum::FILETRANS_SEND)
+                            if ($value["transmission"] == Enum::FILETRANS_SEND)
                             {
                                 $intCount++;
                                 continue;
@@ -2398,7 +2400,7 @@ class SyncCtoModuleClient extends BackendModule
                                 throw new Exception(vsprintf($GLOBALS['TL_LANG']['ERR']['rebuild'], array($value["path"])));
                             }
 
-                            $this->arrListCompare[$strType][$key]["transmission"] = SyncCtoEnum::FILETRANS_SEND;
+                            $this->arrListCompare[$strType][$key]["transmission"] = Enum::FILETRANS_SEND;
 
                             break;
                         }
@@ -2410,7 +2412,7 @@ class SyncCtoModuleClient extends BackendModule
                     }
                     else
                     {
-                        $this->objData->setState(SyncCtoEnum::WORK_OK);
+                        $this->objData->setState(Enum::WORK_OK);
                         $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_3"]['description_1']);
 
                         $this->intStep++;
@@ -2425,7 +2427,7 @@ class SyncCtoModuleClient extends BackendModule
             $objErrTemplate              = new BackendTemplate('be_syncCto_error');
             $objErrTemplate->strErrorMsg = $exc->getMessage();
 
-            $this->objData->setState(SyncCtoEnum::WORK_SKIPPED);
+            $this->objData->setState(Enum::WORK_SKIPPED);
             $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_3"]['description_1']);
             $this->objData->setHtml($objErrTemplate->parse());
             $this->booRefresh = true;
@@ -2462,7 +2464,7 @@ class SyncCtoModuleClient extends BackendModule
                  */
                 case 1:
 
-                    $this->objData->setState(SyncCtoEnum::WORK_WORK);
+                    $this->objData->setState(Enum::WORK_WORK);
                     $this->objData->setTitle($GLOBALS['TL_LANG']['MSC']['step'] . " %s");
                     $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']['step_4']['description_1']);
                     $this->objStepPool->step++;
@@ -2578,7 +2580,7 @@ class SyncCtoModuleClient extends BackendModule
 
                         if (count($arrCompareList['recommended']) == 0 && count($arrCompareList['none_recommended']) == 0)
                         {
-                            $this->objData->setState(SyncCtoEnum::WORK_SKIPPED);
+                            $this->objData->setState(Enum::WORK_SKIPPED);
                             $this->objData->setHtml("");
                             $this->intStep++;
 
@@ -2618,7 +2620,7 @@ class SyncCtoModuleClient extends BackendModule
                     }
                     else
                     {
-                        $this->objData->setState(SyncCtoEnum::WORK_SKIPPED);
+                        $this->objData->setState(Enum::WORK_SKIPPED);
                         $this->objData->setHtml("");
                         $this->intStep++;
                     }
@@ -2652,7 +2654,7 @@ class SyncCtoModuleClient extends BackendModule
                     if (($this->arrSyncSettings["automode"] || array_key_exists("forward", $_POST)) && !(count($this->arrSyncSettings['syncCto_SyncTables']) == 0 && count($this->arrSyncSettings['syncCto_SyncDeleteTables']) == 0))
                     {
                         // Go to next step
-                        $this->objData->setState(SyncCtoEnum::WORK_WORK);
+                        $this->objData->setState(Enum::WORK_WORK);
                         $this->objData->setHtml("");
                         $this->booRefresh = true;
                         $this->objStepPool->step++;
@@ -2664,7 +2666,7 @@ class SyncCtoModuleClient extends BackendModule
                         if (($this->arrSyncSettings["automode"] || array_key_exists("forward", $_POST)) && count($this->arrSyncSettings['syncCto_SyncTables']) == 0 && count($this->arrSyncSettings['syncCto_SyncDeleteTables']) == 0)
                         {
                             // Skip if no tables are selected
-                            $this->objData->setState(SyncCtoEnum::WORK_SKIPPED);
+                            $this->objData->setState(Enum::WORK_SKIPPED);
                             $this->objData->setHtml("");
                             $this->booRefresh = true;
                             $this->intStep++;
@@ -2675,7 +2677,7 @@ class SyncCtoModuleClient extends BackendModule
                         {
                             if (array_key_exists("skip", $_POST))
                             {
-                                $this->objData->setState(SyncCtoEnum::WORK_SKIPPED);
+                                $this->objData->setState(Enum::WORK_SKIPPED);
                                 $this->objData->setHtml("");
                                 $this->booRefresh = true;
                                 $this->intStep++;
@@ -2724,7 +2726,7 @@ class SyncCtoModuleClient extends BackendModule
                  */
                 case 5:
 
-                    $arrResponse = $this->objSyncCtoCommunicationClient->sendFile($GLOBALS['SYC_PATH']['tmp'], $this->objStepPool->zipname, "", SyncCtoEnum::UPLOAD_SQL_TEMP);
+                    $arrResponse = $this->objSyncCtoCommunicationClient->sendFile($GLOBALS['SYC_PATH']['tmp'], $this->objStepPool->zipname, "", Enum::UPLOAD_SQL_TEMP);
 
                     // Check if the file was send and saved.
                     if (!is_array($arrResponse) || count($arrResponse) == 0)
@@ -2869,7 +2871,7 @@ class SyncCtoModuleClient extends BackendModule
                     }
 
                     // Show step information
-                    $this->objData->setState(SyncCtoEnum::WORK_OK);
+                    $this->objData->setState(Enum::WORK_OK);
                     $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']['step_4']['description_4']);
 
                     $this->intStep++;
@@ -2887,7 +2889,7 @@ class SyncCtoModuleClient extends BackendModule
             $objErrTemplate              = new BackendTemplate('be_syncCto_error');
             $objErrTemplate->strErrorMsg = $exc->getMessage();
 
-            $this->objData->setState(SyncCtoEnum::WORK_SKIPPED);
+            $this->objData->setState(Enum::WORK_SKIPPED);
             $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_4"]['description_1']);
             $this->objData->setHtml($objErrTemplate->parse());
             $this->booRefresh = true;
@@ -2914,7 +2916,7 @@ class SyncCtoModuleClient extends BackendModule
         // Set content back to normale mode
         $this->booError = false;
         $this->strError = "";
-        $this->objData->setState(SyncCtoEnum::WORK_WORK);
+        $this->objData->setState(Enum::WORK_WORK);
 
         /* ---------------------------------------------------------------------
          * Run page
@@ -2928,7 +2930,7 @@ class SyncCtoModuleClient extends BackendModule
                  * Init
                  */
                 case 1:
-                    $this->objData->setState(SyncCtoEnum::WORK_WORK);
+                    $this->objData->setState(Enum::WORK_WORK);
                     $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_2']);
                     $this->objData->setTitle($GLOBALS['TL_LANG']['MSC']['step'] . " %s");
                     $this->objStepPool->step++;
@@ -2947,7 +2949,7 @@ class SyncCtoModuleClient extends BackendModule
                         {
                             foreach ($arrLists as $key => $value)
                             {
-                                if ($value["state"] == SyncCtoEnum::FILESTATE_DELETE || $value["state"] == SyncCtoEnum::FILESTATE_FOLDER_DELETE)
+                                if ($value["state"] == Enum::FILESTATE_DELETE || $value["state"] == Enum::FILESTATE_FOLDER_DELETE)
                                 {
                                     $arrDelete[$strType][$key] = $value;
                                 }
@@ -2991,13 +2993,13 @@ class SyncCtoModuleClient extends BackendModule
                         foreach ($this->arrListCompare['core'] as $key => $value)
                         {
                             // Skip some values.
-                            if(in_array($value["state"], array( SyncCtoEnum::FILESTATE_DELETE, SyncCtoEnum::FILESTATE_FOLDER_DELETE, SyncCtoEnum::FILESTATE_TOO_BIG_DELETE)))
+                            if(in_array($value["state"], array( Enum::FILESTATE_DELETE, Enum::FILESTATE_FOLDER_DELETE, Enum::FILESTATE_TOO_BIG_DELETE)))
                             {
                                 continue;
                             }
 
                             // Only add valid ones.
-                            if ($value["transmission"] == SyncCtoEnum::FILETRANS_SEND)
+                            if ($value["transmission"] == Enum::FILETRANS_SEND)
                             {
                                 $arrImport['core'][$key] = $value;
                             }
@@ -3007,13 +3009,13 @@ class SyncCtoModuleClient extends BackendModule
                         foreach ($this->arrListCompare['files'] as $key => $value)
                         {
                             // Skip some values.
-                            if(in_array($value["state"], array(SyncCtoEnum::FILESTATE_DELETE, SyncCtoEnum::FILESTATE_FOLDER_DELETE, SyncCtoEnum::FILESTATE_TOO_BIG_DELETE, SyncCtoEnum::FILESTATE_DBAFS_CONFLICT)))
+                            if(in_array($value["state"], array(Enum::FILESTATE_DELETE, Enum::FILESTATE_FOLDER_DELETE, Enum::FILESTATE_TOO_BIG_DELETE, Enum::FILESTATE_DBAFS_CONFLICT)))
                             {
                                 continue;
                             }
 
                             // Only add valid ones.
-                            if ($value["transmission"] == SyncCtoEnum::FILETRANS_SEND)
+                            if ($value["transmission"] == Enum::FILETRANS_SEND)
                             {
                                 // Add the file to the import array.
                                 $arrImport['files'][$key] = $value;
@@ -3045,7 +3047,7 @@ class SyncCtoModuleClient extends BackendModule
                         foreach ($this->arrListCompare['files'] as $key => $value)
                         {
                             // Skip some values.
-                            if($value["state"] != SyncCtoEnum::FILESTATE_DBAFS_CONFLICT)
+                            if($value["state"] != Enum::FILESTATE_DBAFS_CONFLICT)
                             {
                                 continue;
                             }
@@ -3083,11 +3085,11 @@ class SyncCtoModuleClient extends BackendModule
                                 // Set the state.
                                 if($value['saved'])
                                 {
-                                    $value["transmission"] = SyncCtoEnum::FILETRANS_SEND;
+                                    $value["transmission"] = Enum::FILETRANS_SEND;
                                 }
                                 else
                                 {
-                                    $value["transmission"] = SyncCtoEnum::FILETRANS_SKIPPED;
+                                    $value["transmission"] = Enum::FILETRANS_SKIPPED;
                                 }
 
                                 $this->arrListCompare['files'][$key] = $value;
@@ -3150,7 +3152,7 @@ class SyncCtoModuleClient extends BackendModule
                     }
 
                     $this->objStepPool->step++;
-                    $this->objData->setState(SyncCtoEnum::WORK_OK);
+                    $this->objData->setState(Enum::WORK_OK);
                     $this->objData->setHtml("");
                     $this->booRefresh = true;
                     $this->intStep++;
@@ -3183,7 +3185,7 @@ class SyncCtoModuleClient extends BackendModule
         // Set content back to normale mode
         $this->booError = false;
         $this->strError = "";
-        $this->objData->setState(SyncCtoEnum::WORK_WORK);
+        $this->objData->setState(Enum::WORK_WORK);
 
         /* ---------------------------------------------------------------------
          * Run page
@@ -3197,7 +3199,7 @@ class SyncCtoModuleClient extends BackendModule
                  * Init
                  */
                 case 1:
-                    $this->objData->setState(SyncCtoEnum::WORK_WORK);
+                    $this->objData->setState(Enum::WORK_WORK);
                     $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']['step_1']['description_2']);
                     $this->objData->setTitle($GLOBALS['TL_LANG']['MSC']['step'] . " %s");
                     $this->objStepPool->step++;
@@ -3286,20 +3288,20 @@ class SyncCtoModuleClient extends BackendModule
                             {
                                 switch ($value["transmission"])
                                 {
-                                    case SyncCtoEnum::FILETRANS_SEND:
+                                    case Enum::FILETRANS_SEND:
                                         $intSendCount++;
                                         break;
 
-                                    case SyncCtoEnum::FILETRANS_SKIPPED:
+                                    case Enum::FILETRANS_SKIPPED:
                                         $intSkippCount++;
                                         break;
 
-                                    case SyncCtoEnum::FILETRANS_WAITING:
+                                    case Enum::FILETRANS_WAITING:
                                         $intWaitCount++;
                                         break;
                                 }
 
-                                if ($value["state"] == SyncCtoEnum::FILESTATE_DELETE || $value["state"] == SyncCtoEnum::FILESTATE_FOLDER_DELETE)
+                                if ($value["state"] == Enum::FILESTATE_DELETE || $value["state"] == Enum::FILESTATE_FOLDER_DELETE)
                                 {
                                     $intDelCount++;
                                 }
@@ -3320,7 +3322,7 @@ class SyncCtoModuleClient extends BackendModule
                     if (!is_array($this->arrListCompare) || (count($this->arrListCompare['core']) == 0 && count($this->arrListCompare['files']) == 0))
                     {
                         $this->objData->setHtml("");
-                        $this->objData->setState(SyncCtoEnum::WORK_OK);
+                        $this->objData->setState(Enum::WORK_OK);
                         $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']['step_1']['description_2']);
                         $this->booFinished = true;
 
@@ -3337,7 +3339,7 @@ class SyncCtoModuleClient extends BackendModule
                         $this->objData->nextStep();
                         $this->objData->setTitle($GLOBALS['TL_LANG']['MSC']['complete']);
                         $this->objData->setDescription(vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']['complete_client'], array($strLink, "</a>")));
-                        $this->objData->setState(SyncCtoEnum::WORK_OK);
+                        $this->objData->setState(Enum::WORK_OK);
 
                         break;
                     }
@@ -3345,7 +3347,7 @@ class SyncCtoModuleClient extends BackendModule
                     elseif (is_array($this->arrListCompare) && (count($this->arrListCompare['core']) != 0 || count($this->arrListCompare['files']) != 0))
                     {
                         $this->objData->setHtml("");
-                        $this->objData->setState(SyncCtoEnum::WORK_OK);
+                        $this->objData->setState(Enum::WORK_OK);
                         $this->objData->setDescription(vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_3"]['description_2'], array($intSendCount, (count($this->arrListCompare['core']) + count($this->arrListCompare['files'])))));
                         $this->booFinished = true;
                     }
@@ -3363,7 +3365,7 @@ class SyncCtoModuleClient extends BackendModule
                         {
                             foreach ($arrLists as $value)
                             {
-                                if ($value["transmission"] != SyncCtoEnum::FILETRANS_SKIPPED)
+                                if ($value["transmission"] != Enum::FILETRANS_SKIPPED)
                                 {
                                     continue;
                                 }
@@ -3397,7 +3399,7 @@ class SyncCtoModuleClient extends BackendModule
                         foreach ($this->arrListCompare['files'] as $value)
                         {
                             // Skip files without the dbafs information and no problems with the dbafs.
-                            if (!isset($value['dbafs']) || $value['dbafs']['state'] != SyncCtoEnum::DBAFS_CONFLICT)
+                            if (!isset($value['dbafs']) || $value['dbafs']['state'] != Enum::DBAFS_CONFLICT)
                             {
                                 continue;
                             }
@@ -3461,12 +3463,12 @@ class SyncCtoModuleClient extends BackendModule
                                 {
                                     foreach ($arrLists as $key => $value)
                                     {
-                                        if ($value["transmission"] != SyncCtoEnum::FILETRANS_SEND)
+                                        if ($value["transmission"] != Enum::FILETRANS_SEND)
                                         {
                                             continue;
                                         }
 
-                                        if ($value["state"] == SyncCtoEnum::FILESTATE_DELETE)
+                                        if ($value["state"] == Enum::FILESTATE_DELETE)
                                         {
                                             continue;
                                         }
@@ -3497,12 +3499,12 @@ class SyncCtoModuleClient extends BackendModule
                                 {
                                     foreach ($arrLists as $key => $value)
                                     {
-                                        if ($value["transmission"] != SyncCtoEnum::FILETRANS_SEND)
+                                        if ($value["transmission"] != Enum::FILETRANS_SEND)
                                         {
                                             continue;
                                         }
 
-                                        if ($value["state"] != SyncCtoEnum::FILESTATE_DELETE)
+                                        if ($value["state"] != Enum::FILESTATE_DELETE)
                                         {
                                             continue;
                                         }
@@ -3524,12 +3526,12 @@ class SyncCtoModuleClient extends BackendModule
                                 {
                                     foreach ($arrLists as $key => $value)
                                     {
-                                        if ($value["transmission"] != SyncCtoEnum::FILETRANS_SEND)
+                                        if ($value["transmission"] != Enum::FILETRANS_SEND)
                                         {
                                             continue;
                                         }
 
-                                        if ($value["state"] != SyncCtoEnum::FILESTATE_FOLDER_DELETE)
+                                        if ($value["state"] != Enum::FILESTATE_FOLDER_DELETE)
                                         {
                                             continue;
                                         }
@@ -3561,7 +3563,7 @@ class SyncCtoModuleClient extends BackendModule
                                 {
                                     foreach ($arrLists as $key => $value)
                                     {
-                                        if ($value["transmission"] != SyncCtoEnum::FILETRANS_WAITING)
+                                        if ($value["transmission"] != Enum::FILETRANS_WAITING)
                                         {
                                             continue;
                                         }
@@ -3593,7 +3595,7 @@ class SyncCtoModuleClient extends BackendModule
                     $this->objData->nextStep();
                     $this->objData->setTitle($GLOBALS['TL_LANG']['MSC']['complete']);
                     $this->objData->setDescription(vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']['complete_client'], array($strLink, "</a>")));
-                    $this->objData->setState(SyncCtoEnum::WORK_OK);
+                    $this->objData->setState(Enum::WORK_OK);
 
                     break;
             }
@@ -3629,7 +3631,7 @@ class SyncCtoModuleClient extends BackendModule
         // Set content back to normale mode
         $this->booError = false;
         $this->strError = "";
-        $this->objData->setState(SyncCtoEnum::WORK_WORK);
+        $this->objData->setState(Enum::WORK_WORK);
 
         // Run page
         try
@@ -3640,7 +3642,7 @@ class SyncCtoModuleClient extends BackendModule
                  * Show step
                  */
                 case 1:
-                    $this->objData->setState(SyncCtoEnum::WORK_WORK);
+                    $this->objData->setState(Enum::WORK_WORK);
                     $this->objData->setTitle($GLOBALS['TL_LANG']['MSC']['step'] . " %s");
                     $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_1']);
 
@@ -3783,25 +3785,25 @@ class SyncCtoModuleClient extends BackendModule
                         {
                             switch ($value["state"])
                             {
-                                case SyncCtoEnum::FILESTATE_BOMBASTIC_BIG:
+                                case Enum::FILESTATE_BOMBASTIC_BIG:
                                     $this->arrListCompare[$strType][$key]["css"]     = "unknown";
                                     $this->arrListCompare[$strType][$key]["css_big"] = "ignored";
                                     break;
 
-                                case SyncCtoEnum::FILESTATE_TOO_BIG_NEED:
+                                case Enum::FILESTATE_TOO_BIG_NEED:
                                     $this->arrListCompare[$strType][$key]["css_big"] = "ignored";
-                                case SyncCtoEnum::FILESTATE_NEED:
+                                case Enum::FILESTATE_NEED:
                                     $this->arrListCompare[$strType][$key]["css"] = "modified";
                                     break;
 
-                                case SyncCtoEnum::FILESTATE_TOO_BIG_MISSING:
+                                case Enum::FILESTATE_TOO_BIG_MISSING:
                                     $this->arrListCompare[$strType][$key]["css_big"] = "ignored";
-                                case SyncCtoEnum::FILESTATE_MISSING:
+                                case Enum::FILESTATE_MISSING:
                                     $this->arrListCompare[$strType][$key]["css"] = "new";
                                     break;
 
-                                case SyncCtoEnum::FILESTATE_DELETE:
-                                case SyncCtoEnum::FILESTATE_FOLDER_DELETE:
+                                case Enum::FILESTATE_DELETE:
+                                case Enum::FILESTATE_FOLDER_DELETE:
                                     $this->arrListCompare[$strType][$key]["css"] = "deleted";
                                     break;
 
@@ -3810,14 +3812,14 @@ class SyncCtoModuleClient extends BackendModule
                                     break;
                             }
 
-                            if ($value["state"] == SyncCtoEnum::FILESTATE_TOO_BIG_DELETE
-                                || $value["state"] == SyncCtoEnum::FILESTATE_TOO_BIG_MISSING
-                                || $value["state"] == SyncCtoEnum::FILESTATE_TOO_BIG_NEED
-                                || $value["state"] == SyncCtoEnum::FILESTATE_TOO_BIG_SAME
-                                || $value["state"] == SyncCtoEnum::FILESTATE_BOMBASTIC_BIG
-                                || $value["state"] == SyncCtoEnum::FILESTATE_DELETE
-                                || $value["state"] == SyncCtoEnum::FILESTATE_FOLDER_DELETE
-                                || $value["state"] == SyncCtoEnum::FILESTATE_FOLDER
+                            if ($value["state"] == Enum::FILESTATE_TOO_BIG_DELETE
+                                || $value["state"] == Enum::FILESTATE_TOO_BIG_MISSING
+                                || $value["state"] == Enum::FILESTATE_TOO_BIG_NEED
+                                || $value["state"] == Enum::FILESTATE_TOO_BIG_SAME
+                                || $value["state"] == Enum::FILESTATE_BOMBASTIC_BIG
+                                || $value["state"] == Enum::FILESTATE_DELETE
+                                || $value["state"] == Enum::FILESTATE_FOLDER_DELETE
+                                || $value["state"] == Enum::FILESTATE_FOLDER
                             )
                             {
                                 continue;
@@ -3856,26 +3858,26 @@ class SyncCtoModuleClient extends BackendModule
                         {
                             switch ($value['state'])
                             {
-                                case SyncCtoEnum::FILESTATE_MISSING:
+                                case Enum::FILESTATE_MISSING:
                                     $intCountMissing++;
                                     $intTotalSizeNew += $value["size"];
                                     break;
 
-                                case SyncCtoEnum::FILESTATE_NEED:
+                                case Enum::FILESTATE_NEED:
                                     $intCountNeed++;
                                     $intTotalSizeChange += $value["size"];
                                     break;
 
-                                case SyncCtoEnum::FILESTATE_DELETE:
-                                case SyncCtoEnum::FILESTATE_FOLDER_DELETE:
+                                case Enum::FILESTATE_DELETE:
+                                case Enum::FILESTATE_FOLDER_DELETE:
                                     $intCountDelete++;
                                     $intTotalSizeDel += $value["size"];
                                     break;
 
-                                case SyncCtoEnum::FILESTATE_BOMBASTIC_BIG:
-                                case SyncCtoEnum::FILESTATE_TOO_BIG_NEED:
-                                case SyncCtoEnum::FILESTATE_TOO_BIG_MISSING:
-                                case SyncCtoEnum::FILESTATE_TOO_BIG_DELETE :
+                                case Enum::FILESTATE_BOMBASTIC_BIG:
+                                case Enum::FILESTATE_TOO_BIG_NEED:
+                                case Enum::FILESTATE_TOO_BIG_MISSING:
+                                case Enum::FILESTATE_TOO_BIG_DELETE :
                                     $intCountIgnored++;
                                     break;
                             }
@@ -3891,7 +3893,7 @@ class SyncCtoModuleClient extends BackendModule
                     if ($intCountMissing == 0 && $intCountNeed == 0 && $intCountIgnored == 0 && $intCountDelete == 0)
                     {
                         // Set current step informations
-                        $this->objData->setState(SyncCtoEnum::WORK_SKIPPED);
+                        $this->objData->setState(Enum::WORK_SKIPPED);
                         $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_1']);
                         $this->objData->setHtml("");
                         $this->booRefresh = true;
@@ -3901,7 +3903,7 @@ class SyncCtoModuleClient extends BackendModule
                     }
                     else if (count($this->arrListCompare) == 0 || array_key_exists("skip", $_POST))
                     {
-                        $this->objData->setState(SyncCtoEnum::WORK_SKIPPED);
+                        $this->objData->setState(Enum::WORK_SKIPPED);
                         $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_1']);
                         $this->objData->setHtml("");
                         $this->booRefresh = true;
@@ -3913,7 +3915,7 @@ class SyncCtoModuleClient extends BackendModule
                     }
                     else if (($this->arrSyncSettings["automode"] ||array_key_exists("forward", $_POST)) && count($this->arrListCompare) != 0)
                     {
-                        $this->objData->setState(SyncCtoEnum::WORK_OK);
+                        $this->objData->setState(Enum::WORK_OK);
                         $this->objData->setDescription(vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_4'], array($intCountMissing, $intCountNeed, $intCountDelete, $intCountIgnored, $this->getReadableSize($intTotalSizeNew), $this->getReadableSize($intTotalSizeChange), $this->getReadableSize($intTotalSizeDel))));
                         $this->objData->setHtml("");
                         $this->booRefresh = true;
@@ -3947,7 +3949,7 @@ class SyncCtoModuleClient extends BackendModule
             $objErrTemplate              = new BackendTemplate('be_syncCto_error');
             $objErrTemplate->strErrorMsg = $exc->getMessage();
 
-            $this->objData->setState(SyncCtoEnum::WORK_SKIPPED);
+            $this->objData->setState(Enum::WORK_SKIPPED);
             $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_1']);
             $this->objData->setHtml($objErrTemplate->parse());
             $this->booRefresh = true;
@@ -3971,7 +3973,7 @@ class SyncCtoModuleClient extends BackendModule
         // Set content back to normale mode
         $this->booError = false;
         $this->strError = "";
-        $this->objData->setState(SyncCtoEnum::WORK_WORK);
+        $this->objData->setState(Enum::WORK_WORK);
 
         // Count files
         if (is_array($this->arrListCompare) && count($this->arrListCompare) != 0 && $this->arrListCompare != false)
@@ -3988,20 +3990,20 @@ class SyncCtoModuleClient extends BackendModule
                 {
                     switch ($value["transmission"])
                     {
-                        case SyncCtoEnum::FILETRANS_SEND:
+                        case Enum::FILETRANS_SEND:
                             $intSendCount++;
                             break;
 
-                        case SyncCtoEnum::FILETRANS_SKIPPED:
+                        case Enum::FILETRANS_SKIPPED:
                             $intSkippCount++;
                             break;
 
-                        case SyncCtoEnum::FILETRANS_WAITING:
+                        case Enum::FILETRANS_WAITING:
                             $intWaitCount++;
                             break;
                     }
 
-                    if ($value["state"] == SyncCtoEnum::FILESTATE_DELETE || $value["state"] == SyncCtoEnum::FILESTATE_FOLDER_DELETE)
+                    if ($value["state"] == Enum::FILESTATE_DELETE || $value["state"] == Enum::FILESTATE_FOLDER_DELETE)
                     {
                         $intDelCount++;
                     }
@@ -4025,7 +4027,7 @@ class SyncCtoModuleClient extends BackendModule
                  * Show step
                  */
                 case 1:
-                    $this->objData->setState(SyncCtoEnum::WORK_WORK);
+                    $this->objData->setState(Enum::WORK_WORK);
                     $this->objData->setTitle($GLOBALS['TL_LANG']['MSC']['step'] . " %s");
                     $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_3"]['description_1']);
 
@@ -4043,12 +4045,12 @@ class SyncCtoModuleClient extends BackendModule
                     {
                         foreach ($arrLists as $key => $value)
                         {
-                            if ($value["transmission"] == SyncCtoEnum::FILETRANS_SEND || $value["transmission"] == SyncCtoEnum::FILETRANS_SKIPPED)
+                            if ($value["transmission"] == Enum::FILETRANS_SEND || $value["transmission"] == Enum::FILETRANS_SKIPPED)
                             {
                                 continue;
                             }
 
-                            if (in_array($value["state"], array(SyncCtoEnum::FILESTATE_DELETE, SyncCtoEnum::FILESTATE_FOLDER_DELETE)))
+                            if (in_array($value["state"], array(Enum::FILESTATE_DELETE, Enum::FILESTATE_FOLDER_DELETE)))
                             {
                                 continue;
                             }
@@ -4063,15 +4065,15 @@ class SyncCtoModuleClient extends BackendModule
                                 continue;
                             }
 
-                            if ($value["state"] == SyncCtoEnum::FILESTATE_TOO_BIG
-                                || $value["state"] == SyncCtoEnum::FILESTATE_TOO_BIG_DELETE
-                                || $value["state"] == SyncCtoEnum::FILESTATE_TOO_BIG_NEED
-                                || $value["state"] == SyncCtoEnum::FILESTATE_TOO_BIG_MISSING
-                                || $value["state"] == SyncCtoEnum::FILESTATE_BOMBASTIC_BIG
+                            if ($value["state"] == Enum::FILESTATE_TOO_BIG
+                                || $value["state"] == Enum::FILESTATE_TOO_BIG_DELETE
+                                || $value["state"] == Enum::FILESTATE_TOO_BIG_NEED
+                                || $value["state"] == Enum::FILESTATE_TOO_BIG_MISSING
+                                || $value["state"] == Enum::FILESTATE_BOMBASTIC_BIG
                             )
                             {
                                 $this->arrListCompare[$strType][$key]["skipreason"]   = $GLOBALS['TL_LANG']['ERR']['maximum_filesize'];
-                                $this->arrListCompare[$strType][$key]["transmission"] = SyncCtoEnum::FILETRANS_SKIPPED;
+                                $this->arrListCompare[$strType][$key]["transmission"] = Enum::FILETRANS_SKIPPED;
 
                                 continue;
                             }
@@ -4087,11 +4089,11 @@ class SyncCtoModuleClient extends BackendModule
                                     throw new Exception(vsprintf($GLOBALS['TL_LANG']['ERR']['unknown_file'], $value["path"]));
                                 }
 
-                                $this->arrListCompare[$strType][$key]["transmission"] = SyncCtoEnum::FILETRANS_SEND;
+                                $this->arrListCompare[$strType][$key]["transmission"] = Enum::FILETRANS_SEND;
                             }
                             catch (Exception $exc)
                             {
-                                $this->arrListCompare[$strType][$key]["transmission"] = SyncCtoEnum::FILETRANS_SKIPPED;
+                                $this->arrListCompare[$strType][$key]["transmission"] = Enum::FILETRANS_SKIPPED;
                                 $this->arrListCompare[$strType][$key]["skipreason"]   = $exc->getMessage();
                             }
 
@@ -4124,7 +4126,7 @@ class SyncCtoModuleClient extends BackendModule
                         }
 
                         $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_3"]['description_1']);
-                        $this->objData->setState(SyncCtoEnum::WORK_OK);
+                        $this->objData->setState(Enum::WORK_OK);
                         $this->intStep++;
                     }
 
@@ -4215,13 +4217,13 @@ class SyncCtoModuleClient extends BackendModule
                             }
 
                             if (in_array($value["state"], array(
-                                SyncCtoEnum::FILESTATE_TOO_BIG_DELETE,
-                                SyncCtoEnum::FILESTATE_TOO_BIG_MISSING,
-                                SyncCtoEnum::FILESTATE_TOO_BIG_NEED,
-                                SyncCtoEnum::FILESTATE_TOO_BIG_SAME,
-                                SyncCtoEnum::FILESTATE_BOMBASTIC_BIG,
-                                SyncCtoEnum::FILESTATE_DELETE,
-                                SyncCtoEnum::FILESTATE_FOLDER_DELETE
+                                Enum::FILESTATE_TOO_BIG_DELETE,
+                                Enum::FILESTATE_TOO_BIG_MISSING,
+                                Enum::FILESTATE_TOO_BIG_NEED,
+                                Enum::FILESTATE_TOO_BIG_SAME,
+                                Enum::FILESTATE_BOMBASTIC_BIG,
+                                Enum::FILESTATE_DELETE,
+                                Enum::FILESTATE_FOLDER_DELETE
                             ))
                             )
                             {
@@ -4273,7 +4275,7 @@ class SyncCtoModuleClient extends BackendModule
                     else
                     {
                         $this->objStepPool->step++;
-                        $this->objData->setState(SyncCtoEnum::WORK_WORK);
+                        $this->objData->setState(Enum::WORK_WORK);
                         $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_3"]['description_5']);
                     }
 
@@ -4307,20 +4309,20 @@ class SyncCtoModuleClient extends BackendModule
                             }
 
                             if (in_array($value["state"], array(
-                                SyncCtoEnum::FILESTATE_TOO_BIG_DELETE,
-                                SyncCtoEnum::FILESTATE_TOO_BIG_MISSING,
-                                SyncCtoEnum::FILESTATE_TOO_BIG_NEED,
-                                SyncCtoEnum::FILESTATE_TOO_BIG_SAME,
-                                SyncCtoEnum::FILESTATE_BOMBASTIC_BIG,
-                                SyncCtoEnum::FILESTATE_DELETE,
-                                SyncCtoEnum::FILESTATE_FOLDER_DELETE
+                                Enum::FILESTATE_TOO_BIG_DELETE,
+                                Enum::FILESTATE_TOO_BIG_MISSING,
+                                Enum::FILESTATE_TOO_BIG_NEED,
+                                Enum::FILESTATE_TOO_BIG_SAME,
+                                Enum::FILESTATE_BOMBASTIC_BIG,
+                                Enum::FILESTATE_DELETE,
+                                Enum::FILESTATE_FOLDER_DELETE
                             ))
                             )
                             {
                                 continue;
                             }
 
-                            if ($value["transmission"] == SyncCtoEnum::FILETRANS_SEND)
+                            if ($value["transmission"] == Enum::FILETRANS_SEND)
                             {
                                 $intCount++;
                                 continue;
@@ -4331,7 +4333,7 @@ class SyncCtoModuleClient extends BackendModule
                                 throw new Exception(vsprintf($GLOBALS['TL_LANG']['ERR']['rebuild'], array($value["path"])));
                             }
 
-                            $this->arrListCompare[$strType][$key]["transmission"] = SyncCtoEnum::FILETRANS_SEND;
+                            $this->arrListCompare[$strType][$key]["transmission"] = Enum::FILETRANS_SEND;
 
                             if ($intStart < time() - 30)
                             {
@@ -4346,7 +4348,7 @@ class SyncCtoModuleClient extends BackendModule
                     }
                     else
                     {
-                        $this->objData->setState(SyncCtoEnum::WORK_OK);
+                        $this->objData->setState(Enum::WORK_OK);
                         $this->objData->setDescription(vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_3"]['description_1'], array($intCount, $intCountSplit)));
 
                         $this->intStep++;
@@ -4362,7 +4364,7 @@ class SyncCtoModuleClient extends BackendModule
             $objErrTemplate              = new BackendTemplate('be_syncCto_error');
             $objErrTemplate->strErrorMsg = $exc->getMessage();
 
-            $this->objData->setState(SyncCtoEnum::WORK_SKIPPED);
+            $this->objData->setState(Enum::WORK_SKIPPED);
             $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_3"]['description_1']);
             $this->objData->setHtml($objErrTemplate->parse());
             $this->booRefresh = true;
@@ -4391,7 +4393,7 @@ class SyncCtoModuleClient extends BackendModule
         {
             $this->booError = false;
             $this->strError = "";
-            $this->objData->setState(SyncCtoEnum::WORK_WORK);
+            $this->objData->setState(Enum::WORK_WORK);
 
             $this->objStepPool->step = 1;
         }
@@ -4408,7 +4410,7 @@ class SyncCtoModuleClient extends BackendModule
                  * Init
                  */
                 case 1:
-                    $this->objData->setState(SyncCtoEnum::WORK_WORK);
+                    $this->objData->setState(Enum::WORK_WORK);
                     $this->objData->setTitle($GLOBALS['TL_LANG']['MSC']['step'] . " %s");
                     $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']['step_4']['description_1']);
                     $this->objStepPool->step++;
@@ -4524,7 +4526,7 @@ class SyncCtoModuleClient extends BackendModule
 
                         if (count($arrCompareList['recommended']) == 0 && count($arrCompareList['none_recommended']) == 0)
                         {
-                            $this->objData->setState(SyncCtoEnum::WORK_SKIPPED);
+                            $this->objData->setState(Enum::WORK_SKIPPED);
                             $this->objData->setHtml("");
                             $this->intStep++;
 
@@ -4564,7 +4566,7 @@ class SyncCtoModuleClient extends BackendModule
                     }
                     else
                     {
-                        $this->objData->setState(SyncCtoEnum::WORK_SKIPPED);
+                        $this->objData->setState(Enum::WORK_SKIPPED);
                         $this->objData->setHtml("");
                         $this->intStep++;
                     }
@@ -4576,7 +4578,7 @@ class SyncCtoModuleClient extends BackendModule
                     if (($this->arrSyncSettings['automode'] || key_exists("forward", $_POST)) && !(count($this->arrSyncSettings['syncCto_SyncTables']) == 0 && count($this->arrSyncSettings['syncCto_SyncDeleteTables']) == 0))
                     {
                         // Go to next step
-                        $this->objData->setState(SyncCtoEnum::WORK_WORK);
+                        $this->objData->setState(Enum::WORK_WORK);
                         $this->objData->setHtml("");
                         $this->booRefresh = true;
                         $this->objStepPool->step++;
@@ -4586,7 +4588,7 @@ class SyncCtoModuleClient extends BackendModule
                     else if (($this->arrSyncSettings['automode'] || key_exists("forward", $_POST)) && count($this->arrSyncSettings['syncCto_SyncTables']) == 0 && count($this->arrSyncSettings['syncCto_SyncDeleteTables']) == 0)
                     {
                         // Skip if no tables are selected
-                        $this->objData->setState(SyncCtoEnum::WORK_SKIPPED);
+                        $this->objData->setState(Enum::WORK_SKIPPED);
                         $this->objData->setHtml("");
                         $this->booRefresh = true;
                         $this->intStep++;
@@ -4595,7 +4597,7 @@ class SyncCtoModuleClient extends BackendModule
                     }
                     else if (key_exists("skip", $_POST))
                     {
-                        $this->objData->setState(SyncCtoEnum::WORK_SKIPPED);
+                        $this->objData->setState(Enum::WORK_SKIPPED);
                         $this->objData->setHtml("");
                         $this->booRefresh = true;
                         $this->intStep++;
@@ -4746,7 +4748,7 @@ class SyncCtoModuleClient extends BackendModule
                     }
 
                     // Show step information
-                    $this->objData->setState(SyncCtoEnum::WORK_OK);
+                    $this->objData->setState(Enum::WORK_OK);
                     $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']['step_4']['description_4']);
 
                     $this->intStep++;
@@ -4763,7 +4765,7 @@ class SyncCtoModuleClient extends BackendModule
             $objErrTemplate              = new BackendTemplate('be_syncCto_error');
             $objErrTemplate->strErrorMsg = $exc->getMessage();
 
-            $this->objData->setState(SyncCtoEnum::WORK_SKIPPED);
+            $this->objData->setState(Enum::WORK_SKIPPED);
             $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']['step_4']['description_1']);
             $this->objData->setHtml($objErrTemplate->parse());
             $this->booRefresh = true;
@@ -4790,7 +4792,7 @@ class SyncCtoModuleClient extends BackendModule
         // Set content back to normale mode
         $this->booError = false;
         $this->strError = "";
-        $this->objData->setState(SyncCtoEnum::WORK_WORK);
+        $this->objData->setState(Enum::WORK_WORK);
 
         /* ---------------------------------------------------------------------
          * Run page
@@ -4804,7 +4806,7 @@ class SyncCtoModuleClient extends BackendModule
                  * Init
                  */
                 case 1:
-                    $this->objData->setState(SyncCtoEnum::WORK_WORK);
+                    $this->objData->setState(Enum::WORK_WORK);
                     $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_1']);
                     $this->objData->setTitle($GLOBALS['TL_LANG']['MSC']['step'] . " %s");
                     $this->objStepPool->step++;
@@ -4822,7 +4824,7 @@ class SyncCtoModuleClient extends BackendModule
                         {
                             foreach ($arrLists as $key => $value)
                             {
-                                if (in_array($value["state"], array(SyncCtoEnum::FILESTATE_DELETE, SyncCtoEnum::FILESTATE_FOLDER_DELETE)))
+                                if (in_array($value["state"], array(Enum::FILESTATE_DELETE, Enum::FILESTATE_FOLDER_DELETE)))
                                 {
                                     $arrDelete[$strType][$key] = $this->arrListCompare[$key];
                                 }
@@ -4866,12 +4868,12 @@ class SyncCtoModuleClient extends BackendModule
                         foreach ($this->arrListCompare['core'] as $key => $value)
                         {
                             // Skip some values.
-                            if(in_array($value["state"], array( SyncCtoEnum::FILESTATE_DELETE, SyncCtoEnum::FILESTATE_FOLDER_DELETE, SyncCtoEnum::FILESTATE_TOO_BIG_DELETE)))
+                            if(in_array($value["state"], array( Enum::FILESTATE_DELETE, Enum::FILESTATE_FOLDER_DELETE, Enum::FILESTATE_TOO_BIG_DELETE)))
                             {
                                 continue;
                             }
 
-                            if ($value["transmission"] == SyncCtoEnum::FILETRANS_SEND)
+                            if ($value["transmission"] == Enum::FILETRANS_SEND)
                             {
                                 $arrImport['core'][$key] = $value;
                             }
@@ -4881,13 +4883,13 @@ class SyncCtoModuleClient extends BackendModule
                         foreach ($this->arrListCompare['files'] as $key => $value)
                         {
                             // Skip some values.
-                            if(in_array($value["state"], array( SyncCtoEnum::FILESTATE_DELETE, SyncCtoEnum::FILESTATE_FOLDER_DELETE, SyncCtoEnum::FILESTATE_TOO_BIG_DELETE)))
+                            if(in_array($value["state"], array( Enum::FILESTATE_DELETE, Enum::FILESTATE_FOLDER_DELETE, Enum::FILESTATE_TOO_BIG_DELETE)))
                             {
                                 continue;
                             }
 
                             // Only add valid ones.
-                            if ($value["transmission"] == SyncCtoEnum::FILETRANS_SEND)
+                            if ($value["transmission"] == Enum::FILETRANS_SEND)
                             {
                                 // Add the file to the import array.
                                 $arrImport['files'][$key] = $value;
@@ -4967,7 +4969,7 @@ class SyncCtoModuleClient extends BackendModule
 
                     $this->log(vsprintf("Successfully finishing of synchronization client ID %s.", array($this->Input->get("id"))), __CLASS__ . " " . __FUNCTION__, "INFO");
 
-                    $this->objData->setState(SyncCtoEnum::WORK_OK);
+                    $this->objData->setState(Enum::WORK_OK);
                     $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_1']);
                     $this->objData->setHtml("");
                     $this->booRefresh = true;
@@ -4999,7 +5001,7 @@ class SyncCtoModuleClient extends BackendModule
         // Set content back to normale mode
         $this->booError = false;
         $this->strError = "";
-        $this->objData->setState(SyncCtoEnum::WORK_WORK);
+        $this->objData->setState(Enum::WORK_WORK);
 
         /* ---------------------------------------------------------------------
          * Run page
@@ -5013,7 +5015,7 @@ class SyncCtoModuleClient extends BackendModule
                  * Init
                  */
                 case 1:
-                    $this->objData->setState(SyncCtoEnum::WORK_WORK);
+                    $this->objData->setState(Enum::WORK_WORK);
                     $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']['step_1']['description_2']);
                     $this->objData->setTitle($GLOBALS['TL_LANG']['MSC']['step'] . " %s");
                     $this->objStepPool->step++;
@@ -5066,20 +5068,20 @@ class SyncCtoModuleClient extends BackendModule
                             {
                                 switch ($value["transmission"])
                                 {
-                                    case SyncCtoEnum::FILETRANS_SEND:
+                                    case Enum::FILETRANS_SEND:
                                         $intSendCount++;
                                         break;
 
-                                    case SyncCtoEnum::FILETRANS_SKIPPED:
+                                    case Enum::FILETRANS_SKIPPED:
                                         $intSkippCount++;
                                         break;
 
-                                    case SyncCtoEnum::FILETRANS_WAITING:
+                                    case Enum::FILETRANS_WAITING:
                                         $intWaitCount++;
                                         break;
                                 }
 
-                                if ($value["state"] == SyncCtoEnum::FILESTATE_DELETE || $value["state"] == SyncCtoEnum::FILESTATE_FOLDER_DELETE)
+                                if ($value["state"] == Enum::FILESTATE_DELETE || $value["state"] == Enum::FILESTATE_FOLDER_DELETE)
                                 {
                                     $intDelCount++;
                                 }
@@ -5100,7 +5102,7 @@ class SyncCtoModuleClient extends BackendModule
                     if (!is_array($this->arrListCompare) || (count($this->arrListCompare['core']) == 0 && count($this->arrListCompare['files']) == 0))
                     {
                         $this->objData->setHtml("");
-                        $this->objData->setState(SyncCtoEnum::WORK_OK);
+                        $this->objData->setState(Enum::WORK_OK);
                         $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']['step_1']['description_2']);
                         $this->booFinished = true;
 
@@ -5117,7 +5119,7 @@ class SyncCtoModuleClient extends BackendModule
                         $this->objData->nextStep();
                         $this->objData->setTitle($GLOBALS['TL_LANG']['MSC']['complete']);
                         $this->objData->setDescription(vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']['complete_client'], array($strLink, "</a>")));
-                        $this->objData->setState(SyncCtoEnum::WORK_OK);
+                        $this->objData->setState(Enum::WORK_OK);
 
                         break;
                     }
@@ -5125,7 +5127,7 @@ class SyncCtoModuleClient extends BackendModule
                     elseif (is_array($this->arrListCompare) && (count($this->arrListCompare['core']) != 0 || count($this->arrListCompare['files']) != 0))
                     {
                         $this->objData->setHtml("");
-                        $this->objData->setState(SyncCtoEnum::WORK_OK);
+                        $this->objData->setState(Enum::WORK_OK);
                         $this->objData->setDescription(vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_3"]['description_2'], array($intSendCount, (count($this->arrListCompare['core']) + count($this->arrListCompare['files'])))));
                         $this->booFinished = true;
                     }
@@ -5143,7 +5145,7 @@ class SyncCtoModuleClient extends BackendModule
                         {
                             foreach ($arrLists as $value)
                             {
-                                if ($value["transmission"] != SyncCtoEnum::FILETRANS_SKIPPED)
+                                if ($value["transmission"] != Enum::FILETRANS_SKIPPED)
                                 {
                                     continue;
                                 }
@@ -5177,7 +5179,7 @@ class SyncCtoModuleClient extends BackendModule
                         foreach ($this->arrListCompare['files'] as $key => $value)
                         {
                             // Skip files without the dbafs information and no problems with the dbafs.
-                            if (!isset($value['dbafs']) || $value['dbafs']['state'] != SyncCtoEnum::DBAFS_CONFLICT)
+                            if (!isset($value['dbafs']) || $value['dbafs']['state'] != Enum::DBAFS_CONFLICT)
                             {
                                 continue;
                             }
@@ -5240,12 +5242,12 @@ class SyncCtoModuleClient extends BackendModule
                                 {
                                     foreach ($arrLists as $key => $value)
                                     {
-                                        if ($value["transmission"] != SyncCtoEnum::FILETRANS_SEND)
+                                        if ($value["transmission"] != Enum::FILETRANS_SEND)
                                         {
                                             continue;
                                         }
 
-                                        if ($value["state"] == SyncCtoEnum::FILESTATE_DELETE)
+                                        if ($value["state"] == Enum::FILESTATE_DELETE)
                                         {
                                             continue;
                                         }
@@ -5276,12 +5278,12 @@ class SyncCtoModuleClient extends BackendModule
                                 {
                                     foreach ($arrLists as $key => $value)
                                     {
-                                        if ($value["transmission"] != SyncCtoEnum::FILETRANS_SEND)
+                                        if ($value["transmission"] != Enum::FILETRANS_SEND)
                                         {
                                             continue;
                                         }
 
-                                        if ($value["state"] != SyncCtoEnum::FILESTATE_DELETE)
+                                        if ($value["state"] != Enum::FILESTATE_DELETE)
                                         {
                                             continue;
                                         }
@@ -5303,12 +5305,12 @@ class SyncCtoModuleClient extends BackendModule
                                 {
                                     foreach ($arrLists as $key => $value)
                                     {
-                                        if ($value["transmission"] != SyncCtoEnum::FILETRANS_SEND)
+                                        if ($value["transmission"] != Enum::FILETRANS_SEND)
                                         {
                                             continue;
                                         }
 
-                                        if ($value["state"] != SyncCtoEnum::FILESTATE_FOLDER_DELETE)
+                                        if ($value["state"] != Enum::FILESTATE_FOLDER_DELETE)
                                         {
                                             continue;
                                         }
@@ -5340,7 +5342,7 @@ class SyncCtoModuleClient extends BackendModule
                                 {
                                     foreach ($arrLists as $key => $value)
                                     {
-                                        if ($value["transmission"] != SyncCtoEnum::FILETRANS_WAITING)
+                                        if ($value["transmission"] != Enum::FILETRANS_WAITING)
                                         {
                                             continue;
                                         }
@@ -5372,7 +5374,7 @@ class SyncCtoModuleClient extends BackendModule
                     $this->objData->nextStep();
                     $this->objData->setTitle($GLOBALS['TL_LANG']['MSC']['complete']);
                     $this->objData->setDescription(vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']['complete_client'], array($strLink, "</a>")));
-                    $this->objData->setState(SyncCtoEnum::WORK_OK);
+                    $this->objData->setState(Enum::WORK_OK);
 
                     break;
             }

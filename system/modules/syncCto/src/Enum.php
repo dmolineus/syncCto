@@ -9,10 +9,12 @@
  * @filesource
  */
 
+namespace SyncCto;
+
 /**
  * Enum class with constants
  */
-class SyncCtoEnum
+class Enum
 {
     /**
      * File/Folder state

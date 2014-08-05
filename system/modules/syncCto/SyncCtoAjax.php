@@ -8,6 +8,8 @@
  * @license    GNU/LGPL 
  * @filesource
  */
+
+use SyncCto\Enum;
  
 /**
  * Beta Class for syncCto and AJAX
@@ -127,7 +129,7 @@ class SyncCtoAjax extends SyncCtoCommunicationClient
             throw new Exception("File: $strFile not exists.");
         }
 
-        parent::sendFile(dirname($strFile), basename($strFile), md5_file(TL_ROOT . "/" . $strFile), SyncCtoEnum::UPLOAD_SYNC_TEMP);
+        parent::sendFile(dirname($strFile), basename($strFile), md5_file(TL_ROOT . "/" . $strFile), Enum::UPLOAD_SYNC_TEMP);
     }
 
 }

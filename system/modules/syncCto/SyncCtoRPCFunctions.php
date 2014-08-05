@@ -9,6 +9,8 @@
  * @filesource
  */
 
+use SyncCto\Enum;
+
 class SyncCtoRPCFunctions extends Backend
 {
     /* -------------------------------------------------------------------------
@@ -87,7 +89,7 @@ class SyncCtoRPCFunctions extends Backend
     public function getLocalConfig($arrConfigBlacklist)
     {
         // Load localconfig
-        $arrConfig = $this->objSyncCtoHelper->loadConfigs(SyncCtoEnum::LOADCONFIG_KEY_VALUE);
+        $arrConfig = $this->objSyncCtoHelper->loadConfigs(Enum::LOADCONFIG_KEY_VALUE);
 
         // Kick blacklist entries
         foreach ($arrConfig as $key => $value)
@@ -142,7 +144,7 @@ class SyncCtoRPCFunctions extends Backend
      */
     public function setAttentionFlag($booMode)
     {
-        $arrLocalConfig = $this->objSyncCtoHelper->loadConfigs(SyncCtoEnum::LOADCONFIG_KEYS_ONLY);
+        $arrLocalConfig = $this->objSyncCtoHelper->loadConfigs(Enum::LOADCONFIG_KEYS_ONLY);
 
         if (in_array("\$GLOBALS['TL_CONFIG']['syncCto_attentionFlag']", $arrLocalConfig))
         {

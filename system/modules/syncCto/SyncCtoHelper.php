@@ -9,6 +9,8 @@
  * @filesource
  */
 
+use SyncCto\Enum;
+
 /**
  * Helper class for syncCto. Callback functions, small global helper functions.
  */
@@ -168,7 +170,7 @@ class SyncCtoHelper extends Backend
      */
     public function loadConfigs($intTyp = 1)
     {
-        if ($intTyp != SyncCtoEnum::LOADCONFIG_KEYS_ONLY && $intTyp != SyncCtoEnum::LOADCONFIG_KEY_VALUE)
+        if ($intTyp != Enum::LOADCONFIG_KEYS_ONLY && $intTyp != Enum::LOADCONFIG_KEY_VALUE)
         {
             throw new Exception("Unknown type for " . __CLASS__ . " in function " . __FUNCTION__);
         }
@@ -213,13 +215,13 @@ class SyncCtoHelper extends Backend
             {
                 $arrChunks = array_map('trim', explode('=', $strLine, 2));
 
-                if ($intTyp == SyncCtoEnum::LOADCONFIG_KEYS_ONLY)
+                if ($intTyp == Enum::LOADCONFIG_KEYS_ONLY)
                 {
                     $arrData[] = str_replace(array("$", "GLOBALS['TL_CONFIG']['", "']"), array("", "", ""), $arrChunks[0]);
                 }
                 else
                 {
-                    if ($intTyp == SyncCtoEnum::LOADCONFIG_KEY_VALUE)
+                    if ($intTyp == Enum::LOADCONFIG_KEY_VALUE)
                     {
                         $key           = str_replace(array("$", "GLOBALS['TL_CONFIG']['", "']"), array("", "", ""), $arrChunks[0]);
                         $arrData[$key] = $GLOBALS['TL_CONFIG'][$key];
@@ -1274,7 +1276,7 @@ class SyncCtoHelper extends Backend
      */
     public function importConfig($arrConfig)
     {
-        $arrLocalConfig = $this->loadConfigs(SyncCtoEnum::LOADCONFIG_KEYS_ONLY);
+        $arrLocalConfig = $this->loadConfigs(Enum::LOADCONFIG_KEYS_ONLY);
 
         foreach ($arrConfig as $key => $value)
         {

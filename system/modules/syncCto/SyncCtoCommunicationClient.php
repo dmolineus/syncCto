@@ -9,6 +9,8 @@
  * @filesource
  */
 
+use SyncCto\Enum;
+
 /**
  * Communication Class
  * 
@@ -359,7 +361,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
         );
 
         // Set no codify engine
-        $this->setCodifyEngine(SyncCtoEnum::CODIFY_EMPTY);
+        $this->setCodifyEngine(Enum::CODIFY_EMPTY);
 
         return $this->runServer("SYNCCTO_CHECKSUM_FILES", $arrData);
     }
@@ -372,7 +374,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
     public function getChecksumCore()
     {
         // Set no codify engine
-        $this->setCodifyEngine(SyncCtoEnum::CODIFY_EMPTY);
+        $this->setCodifyEngine(Enum::CODIFY_EMPTY);
 
         return $this->runServer("SYNCCTO_CHECKSUM_CORE");
     }
@@ -941,7 +943,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
         // Load blacklist for localconfig
         $arrConfigBlacklist = $this->objSyncCtoHelper->getBlacklistLocalconfig();
         // Load localconfig
-        $arrConfig = $this->objSyncCtoHelper->loadConfigs(SyncCtoEnum::LOADCONFIG_KEY_VALUE);
+        $arrConfig = $this->objSyncCtoHelper->loadConfigs(Enum::LOADCONFIG_KEY_VALUE);
 
         // Kick blacklist entries
         foreach ($arrConfig as $key => $value)
