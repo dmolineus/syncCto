@@ -144,8 +144,14 @@ abstract class Base
         $this->arrErrors[] = $strError;
     }
 
+    /**
+     * Load the template list and go through the steps
+     */
     abstract public function run();
 
+    /**
+     * Initialize get parameter
+     */
     abstract protected function initGetParams();
 
     /**
@@ -259,4 +265,4 @@ abstract class Base
         $this->objPopupTemplate->output();
     }
 
-} 
+}

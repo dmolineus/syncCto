@@ -124,11 +124,13 @@ class DB extends Base
                 $this->mixStep = self::STEP_ERROR_DB;
             }
         }
-        else if ($this->mixStep == self::STEP_CLOSE_DB)
+
+        if ($this->mixStep == self::STEP_CLOSE_DB)
         {
             $this->showClose();
         }
-        else if ($this->mixStep == self::STEP_ERROR_DB)
+
+        if ($this->mixStep == self::STEP_ERROR_DB)
         {
             $this->showError();
         }
@@ -277,11 +279,11 @@ class DB extends Base
         {
             if (is_array($GLOBALS['TL_LANG']['tl_syncCto_database'][$strName]))
             {
-                return $this->formateLookUpName($strName, $GLOBALS['TL_LANG']['tl_syncCto_database'][$strName][0]);
+                return $this->formatLookUpName($strName, $GLOBALS['TL_LANG']['tl_syncCto_database'][$strName][0]);
             }
             else
             {
-                return $this->formateLookUpName($strName, $GLOBALS['TL_LANG']['tl_syncCto_database'][$strName]);
+                return $this->formatLookUpName($strName, $GLOBALS['TL_LANG']['tl_syncCto_database'][$strName]);
             }
         }
 
@@ -308,7 +310,7 @@ class DB extends Base
                         }
                     }
 
-                    return $this->formateLookUpName($strName, $strReturn);
+                    return $this->formatLookUpName($strName, $strReturn);
                 }
             }
             catch (\Exception $exc)
@@ -324,11 +326,11 @@ class DB extends Base
 
             if (is_array($GLOBALS['TL_LANG']['MOD'][$strRealSystemName]))
             {
-                return $this->formateLookUpName($strName, $GLOBALS['TL_LANG']['MOD'][$strRealSystemName][0]);
+                return $this->formatLookUpName($strName, $GLOBALS['TL_LANG']['MOD'][$strRealSystemName][0]);
             }
             else
             {
-                return $this->formateLookUpName($strName, $GLOBALS['TL_LANG']['MOD'][$strRealSystemName]);
+                return $this->formatLookUpName($strName, $GLOBALS['TL_LANG']['MOD'][$strRealSystemName]);
             }
         }
 
@@ -337,26 +339,27 @@ class DB extends Base
         {
             if (is_array($GLOBALS['TL_LANG']['MOD'][$strBase]))
             {
-                return $this->formateLookUpName($strName, $GLOBALS['TL_LANG']['MOD'][$strBase][0]);
+                return $this->formatLookUpName($strName, $GLOBALS['TL_LANG']['MOD'][$strBase][0]);
             }
             else
             {
-                return $this->formateLookUpName($strName, $GLOBALS['TL_LANG']['MOD'][$strBase]);
+                return $this->formatLookUpName($strName, $GLOBALS['TL_LANG']['MOD'][$strBase]);
             }
         }
 
-        return $this->formateLookUpName($strName, $strName);
+        return $this->formatLookUpName($strName, $strName);
     }
 
     /**
-     * Return a array with tahble names
+     * Return a array with table names.
      *
-     * @param string $strTableName    real name like 'tl_contetn'
-     * @param string $strReadableName readable name like 'Conten Elements'
+     * @param string $strTableName    Real name like 'tl_contetn'.
+     *
+     * @param string $strReadableName Readable name like 'Conten Elements'.
      *
      * @return array('tname' => [for table], 'iname' => [for title/info])
      */
-    protected function formateLookUpName($strTableName, $strReadableName)
+    protected function formatLookUpName($strTableName, $strReadableName)
     {
         // Check if the function is activate
         if (\BackendUser::getInstance()->syncCto_useTranslatedNames)
