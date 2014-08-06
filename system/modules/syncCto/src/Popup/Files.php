@@ -9,35 +9,14 @@
  * @filesource
  */
 
-/**
- * Initialize the system
- */
-$dir = dirname(isset($_SERVER['SCRIPT_FILENAME']) ? $_SERVER['SCRIPT_FILENAME'] : __FILE__);
+namespace SyncCto\Popup;
 
-while ($dir && $dir != '.' && $dir != '/' && !is_file($dir . '/system/initialize.php'))
-{
-    $dir = dirname($dir);
-}
-
-if (!is_file($dir . '/system/initialize.php'))
-{
-    header("HTTP/1.0 500 Internal Server Error");
-    header('Content-Type: text/html; charset=utf-8');
-    echo '<h1>500 Internal Server Error</h1>';
-    echo '<p>Could not find initialize.php!</p>';
-    exit(1);
-}
-
-define('TL_MODE', 'BE');
-require($dir . '/system/initialize.php');
-
-use SyncCto\Popup\Base;
 use SyncCto\Enum;
 
 /**
  * Class SyncCtoPopupFiles
  */
-class SyncCtoPopupFiles extends Base
+class Files extends Base
 {
     /**
      * The id of the client.
@@ -295,7 +274,7 @@ class SyncCtoPopupFiles extends Base
         $arrLanguageTags[Enum::FILESTATE_DBAFS_CONFLICT]  = $GLOBALS['TL_LANG']['MSC']['dbafs_conflict'];
 
         // Set template
-        $this->objTemplate                  = new BackendTemplate('be_syncCto_files');
+        $this->objTemplate                  = new \BackendTemplate('be_syncCto_files');
         $this->objTemplate->maxLength       = 55;
         $this->objTemplate->arrLangStates   = $arrLanguageTags;
         $this->objTemplate->normalFilelist  = $arrNormalFiles;
@@ -313,7 +292,7 @@ class SyncCtoPopupFiles extends Base
      */
     protected function loadTempLists()
     {
-        $objFileList = new File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "syncfilelist-ID-" . $this->intClientID . ".txt"));
+        $objFileList = new \File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "syncfilelist-ID-" . $this->intClientID . ".txt"));
         $strContent  = $objFileList->getContent();
         if (strlen($strContent) == 0)
         {
@@ -325,7 +304,7 @@ class SyncCtoPopupFiles extends Base
         }
         $objFileList->close();
 
-        $objCompareList = new File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "synccomparelist-ID-" . $this->intClientID . ".txt"));
+        $objCompareList = new \File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "synccomparelist-ID-" . $this->intClientID . ".txt"));
         $strContent     = $objCompareList->getContent();
         if (strlen($strContent) == 0)
         {
@@ -344,11 +323,11 @@ class SyncCtoPopupFiles extends Base
      */
     protected function saveTempLists()
     {
-        $objFileList = new File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "syncfilelist-ID-" . $this->intClientID . ".txt"));
+        $objFileList = new \File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "syncfilelist-ID-" . $this->intClientID . ".txt"));
         $objFileList->write(serialize($this->arrListFile));
         $objFileList->close();
 
-        $objCompareList = new File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "synccomparelist-ID-" . $this->intClientID . ".txt"));
+        $objCompareList = new \File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "synccomparelist-ID-" . $this->intClientID . ".txt"));
         $objCompareList->write(serialize($this->arrListCompare));
         $objCompareList->close();
     }
@@ -373,9 +352,3 @@ class SyncCtoPopupFiles extends Base
     }
 
 }
-
-/**
- * Instantiate controller
- */
-$objPopup = new SyncCtoPopupFiles();
-$objPopup->run();
