@@ -9,34 +9,12 @@
  * @filesource
  */
 
-/**
- * Initialize the system
- */
-$dir = dirname(isset($_SERVER['SCRIPT_FILENAME']) ? $_SERVER['SCRIPT_FILENAME'] : __FILE__);
-
-while ($dir && $dir != '.' && $dir != '/' && !is_file($dir . '/system/initialize.php'))
-{
-    $dir = dirname($dir);
-}
-
-if (!is_file($dir . '/system/initialize.php'))
-{
-    header("HTTP/1.0 500 Internal Server Error");
-    header('Content-Type: text/html; charset=utf-8');
-    echo '<h1>500 Internal Server Error</h1>';
-    echo '<p>Could not find initialize.php!</p>';
-    exit(1);
-}
-
-define('TL_MODE', 'BE');
-require($dir . '/system/initialize.php');
-
-use SyncCto\Popup\Base;
+namespace SyncCto\Popup;
 
 /**
  * Class SyncCtoPopup
  */
-class SyncCtoPopupDB extends Base
+class DB extends Base
 {
     /**
      * The id of the client.
@@ -140,7 +118,7 @@ class SyncCtoPopupDB extends Base
 
                 unset($_POST);
             }
-            catch (Exception $exc)
+            catch (\Exception $exc)
             {
                 $this->addError($exc->getMessage());
                 $this->mixStep = self::STEP_ERROR_DB;
@@ -157,12 +135,7 @@ class SyncCtoPopupDB extends Base
 
         // Output template
         $strHeadline     = basename(utf8_convert_encoding($this->strFile, $GLOBALS['TL_CONFIG']['characterSet']));
-        $arrTemplateData = array
-        (
-            'id'        => $this->intClientID,
-            'step'      => $this->mixStep,
-            'direction' => $this->strMode,
-        );
+        $arrTemplateData = array('id' => $this->intClientID, 'step' => $this->mixStep, 'direction' => $this->strMode,);
 
         $this->output($strHeadline, $arrTemplateData);
     }
@@ -232,9 +205,7 @@ class SyncCtoPopupDB extends Base
         }
 
         // If no table is found skip the view
-        if (count($this->arrSyncSettings['syncCto_CompareTables']['recommended']) == 0
-            && count($this->arrSyncSettings['syncCto_CompareTables']['nonRecommended']) == 0
-        )
+        if (count($this->arrSyncSettings['syncCto_CompareTables']['recommended']) == 0 && count($this->arrSyncSettings['syncCto_CompareTables']['nonRecommended']) == 0)
         {
             unset($this->arrSyncSettings['syncCto_CompareTables']);
             $this->arrSyncSettings['syncCto_SyncDeleteTables'] = array();
@@ -267,7 +238,7 @@ class SyncCtoPopupDB extends Base
             $this->arrSyncSettings['syncCto_CompareTables']['nonRecommended'][$strKey]['client']['iname'] = $arrTransClient['iname'];
         }
 
-        $this->objTemplate                 = new BackendTemplate("be_syncCto_database");
+        $this->objTemplate                 = new \BackendTemplate("be_syncCto_database");
         $this->objTemplate->headline       = $GLOBALS['TL_LANG']['MSC']['comparelist'];
         $this->objTemplate->arrCompareList = $this->arrSyncSettings['syncCto_CompareTables'];
         $this->objTemplate->close          = false;
@@ -298,10 +269,7 @@ class SyncCtoPopupDB extends Base
         // If empty return a array.
         if ($strName == '-')
         {
-            return array(
-                'tname' => '-',
-                'iname' => '-'
-            );
+            return array('tname' => '-', 'iname' => '-');
         }
 
         // Make a lookup in syncCto language files
@@ -343,13 +311,13 @@ class SyncCtoPopupDB extends Base
                     return $this->formateLookUpName($strName, $strReturn);
                 }
             }
-            catch (Exception $exc)
+            catch (\Exception $exc)
             {
                 // Nothing to do;
             }
         }
 
-        // Little mapping for names        
+        // Little mapping for names
         if (is_array($GLOBALS['SYC_CONFIG']['database_mapping']) && array_key_exists($strName, $GLOBALS['SYC_CONFIG']['database_mapping']))
         {
             $strRealSystemName = $GLOBALS['SYC_CONFIG']['database_mapping'][$strName];
@@ -393,23 +361,11 @@ class SyncCtoPopupDB extends Base
         // Check if the function is activate
         if (\BackendUser::getInstance()->syncCto_useTranslatedNames)
         {
-            return array(
-                'tname' => $strReadableName,
-                'iname' => $strTableName
-            );
+            return array('tname' => $strReadableName, 'iname' => $strTableName);
         }
         else
         {
-            return array(
-                'tname' => $strTableName,
-                'iname' => $strReadableName
-            );
+            return array('tname' => $strTableName, 'iname' => $strReadableName);
         }
     }
 }
-
-/**
- * Instantiate controller
- */
-$objPopup = new SyncCtoPopupDB();
-$objPopup->run();
