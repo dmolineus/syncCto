@@ -128,6 +128,7 @@ class SyncCtoPopupDB extends Base
      */
     public function run()
     {
+        // Run the steps.
         if ($this->mixStep == self::STEP_NORMAL_DB)
         {
             // Set client for communication
@@ -145,13 +146,11 @@ class SyncCtoPopupDB extends Base
                 $this->mixStep = self::STEP_ERROR_DB;
             }
         }
-
-        if ($this->mixStep == self::STEP_CLOSE_DB)
+        else if ($this->mixStep == self::STEP_CLOSE_DB)
         {
             $this->showClose();
         }
-
-        if ($this->mixStep == self::STEP_ERROR_DB)
+        else if ($this->mixStep == self::STEP_ERROR_DB)
         {
             $this->showError();
         }
