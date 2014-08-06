@@ -9,6 +9,8 @@
  * @filesource
  */
 
+namespace SyncCto\Files\Iterator;
+
 /**
  * Class for file filtering operations
  */

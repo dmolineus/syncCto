@@ -9,10 +9,12 @@
  * @filesource
  */
 
+namespace SyncCto\Files\Iterator;
+
 /**
  * Class for file filtering operations
  */
-class SyncCtoFilterIteratorBase extends RecursiveFilterIterator
+class SyncCtoFilterIteratorBase extends \RecursiveFilterIterator
 {
     ////////////////////////////////////////////////////////////////////////////
     // Vars
@@ -30,7 +32,7 @@ class SyncCtoFilterIteratorBase extends RecursiveFilterIterator
 
     /**
      * 
-     * @param RecursiveIterator $iterator The RecursiveIterator to be filtered.
+     * @param \RecursiveIterator $iterator The RecursiveIterator to be filtered.
      */
     public function __construct(\RecursiveIterator $iterator)
     {
@@ -38,7 +40,7 @@ class SyncCtoFilterIteratorBase extends RecursiveFilterIterator
         parent::__construct($iterator);
 
         // Init some helper.
-        $this->objSyncCtoFiles  = SyncCtoFiles::getInstance();
+        $this->objSyncCtoFiles  = \SyncCtoFiles::getInstance();
     }
 
     /**
