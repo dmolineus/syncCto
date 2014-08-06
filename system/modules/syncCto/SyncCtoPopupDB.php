@@ -31,55 +31,96 @@ if (!is_file($dir . '/system/initialize.php'))
 define('TL_MODE', 'BE');
 require($dir . '/system/initialize.php');
 
+use SyncCto\Popup\Base;
+
 /**
  * Class SyncCtoPopup
  */
-class SyncCtoPopupDB extends Backend
+class SyncCtoPopupDB extends Base
 {
-
-    // Vars
+    /**
+     * The id of the client.
+     *
+     * @var int
+     */
     protected $intClientID;
-    protected $strMode;
-    // Helper Classes
-    protected $objSyncCtoHelper;
-    // Temp data
-    protected $arrSyncSettings = array();
-    protected $arrErrors = array();
 
-    // defines
+    /**
+     * The mode syncTo or syncFrom.
+     *
+     * @var string
+     */
+    protected $strMode;
+
+    /**
+     * The current step to running.
+     *
+     * @var string
+     */
+    protected $mixStep;
+
+    /**
+     * Step Mode: Normal
+     */
     const STEP_NORMAL_DB = 'nd';
-    const STEP_CLOSE_DB  = 'cl';
-    const STEP_ERROR_DB  = 'er';
+
+    /**
+     * Step Mode: Close
+     */
+    const STEP_CLOSE_DB = 'cl';
+
+    /**
+     * Step Mode: Error
+     */
+    const STEP_ERROR_DB = 'er';
 
     /**
      * Initialize the object
      */
     public function __construct()
     {
-        // Check user auth
-        \BackendUser::getInstance()->authenticate();
-
-        // Call the parent.
         parent::__construct();
 
-        // Set language from get or user
-        if (\Input::getInstance()->get('language') != '')
+        // Load language
+        \System::loadLanguageFile('modules');
+        \System::loadLanguageFile('tl_syncCto_database');
+
+        // Setup the parent vars.
+        $this->setTemplate('be_syncCto_database');
+        $this->setPopupTemplate('be_syncCto_popup');
+    }
+
+    /**
+     * Initialize get parameter
+     */
+    protected function initGetParams()
+    {
+        // Get Client id
+        if (strlen(\Input::get('id')) != 0)
         {
-            $GLOBALS['TL_LANGUAGE'] = \Input::getInstance()->get('language');
+            $this->intClientID = intval(\Input::get('id'));
         }
         else
         {
-            $GLOBALS['TL_LANGUAGE'] = \BackendUser::getInstance()->language;
+            $this->mixStep = self::STEP_ERROR_DB;
+            return;
         }
 
-        // Load language
-        $this->loadLanguageFile('default');
-        $this->loadLanguageFile("modules");
-        $this->loadLanguageFile("tl_syncCto_database");
+        // Get next step
+        if (strlen(\Input::get('step')) != 0)
+        {
+            $this->mixStep = \Input::get('step');
+        }
+        else
+        {
+            $this->mixStep = self::STEP_NORMAL_DB;
+        }
 
-        $this->objSyncCtoHelper = SyncCtoHelper::getInstance();
-
-        $this->initGetParams();
+        // Get direction
+        if (strlen(\Input::get('direction')) != 0)
+        {
+            $this->strMode = \Input::get('direction');
+        }
     }
 
     /**
@@ -92,16 +133,16 @@ class SyncCtoPopupDB extends Backend
             // Set client for communication
             try
             {
-                $this->loadSyncSettings();
+                $this->loadSyncSettings($this->intClientID);
                 $this->showNormalDatabase();
-                $this->saveSyncSettings();
+                $this->saveSyncSettings($this->intClientID);
 
                 unset($_POST);
             }
             catch (Exception $exc)
             {
-                $this->arrErrors[] = $exc->getMessage();
-                $this->mixStep     = self::STEP_ERROR_DB;
+                $this->addError($exc->getMessage());
+                $this->mixStep = self::STEP_ERROR_DB;
             }
         }
 
@@ -116,7 +157,15 @@ class SyncCtoPopupDB extends Backend
         }
 
         // Output template
-        $this->output();
+        $strHeadline     = basename(utf8_convert_encoding($this->strFile, $GLOBALS['TL_CONFIG']['characterSet']));
+        $arrTemplateData = array
+        (
+            'id'        => $this->intClientID,
+            'step'      => $this->mixStep,
+            'direction' => $this->strMode,
+        );
+
+        $this->output($strHeadline, $arrTemplateData);
     }
 
     /**
@@ -130,26 +179,26 @@ class SyncCtoPopupDB extends Backend
             // Make a array from 'serverTables' and 'serverDeleteTables'
             $arrRemoveTables = array();
 
-            if (is_array(\Input::getInstance()->post('serverTables')) && count(\Input::getInstance()->post('serverTables')) != 0)
+            if (is_array(\Input::post('serverTables')) && count(\Input::post('serverTables')) != 0)
             {
-                $arrRemoveTables = \Input::getInstance()->post('serverTables');
+                $arrRemoveTables = \Input::post('serverTables');
             }
 
-            if (is_array(\Input::getInstance()->post('serverDeleteTables')) && count(\Input::getInstance()->post('serverDeleteTables')) != 0)
+            if (is_array(\Input::post('serverDeleteTables')) && count(\Input::post('serverDeleteTables')) != 0)
             {
-                $arrRemoveTables = array_merge($arrRemoveTables, \Input::getInstance()->post('serverDeleteTables'));
+                $arrRemoveTables = array_merge($arrRemoveTables, \Input::post('serverDeleteTables'));
             }
 
             // Remove tables from the list.
             foreach ($arrRemoveTables as $value)
             {
-                if (isset($this->arrSyncSettings['syncCto_CompareTables']['recommended']) && key_exists($value, $this->arrSyncSettings['syncCto_CompareTables']['recommended']))
+                if (isset($this->arrSyncSettings['syncCto_CompareTables']['recommended']) && array_key_exists($value, $this->arrSyncSettings['syncCto_CompareTables']['recommended']))
                 {
                     unset($this->arrSyncSettings['syncCto_CompareTables']['recommended'][$value]);
                 }
                 else
                 {
-                    if (isset($this->arrSyncSettings['syncCto_CompareTables']['nonRecommended']) && key_exists($value, $this->arrSyncSettings['syncCto_CompareTables']['nonRecommended']))
+                    if (isset($this->arrSyncSettings['syncCto_CompareTables']['nonRecommended']) && array_key_exists($value, $this->arrSyncSettings['syncCto_CompareTables']['nonRecommended']))
                     {
                         unset($this->arrSyncSettings['syncCto_CompareTables']['nonRecommended'][$value]);
                     }
@@ -219,18 +268,18 @@ class SyncCtoPopupDB extends Backend
             $this->arrSyncSettings['syncCto_CompareTables']['nonRecommended'][$strKey]['client']['iname'] = $arrTransClient['iname'];
         }
 
-        $this->Template                 = new BackendTemplate("be_syncCto_database");
-        $this->Template->headline       = $GLOBALS['TL_LANG']['MSC']['comparelist'];
-        $this->Template->arrCompareList = $this->arrSyncSettings['syncCto_CompareTables'];
-        $this->Template->close          = false;
-        $this->Template->error          = false;
+        $this->objTemplate                 = new BackendTemplate("be_syncCto_database");
+        $this->objTemplate->headline       = $GLOBALS['TL_LANG']['MSC']['comparelist'];
+        $this->objTemplate->arrCompareList = $this->arrSyncSettings['syncCto_CompareTables'];
+        $this->objTemplate->close          = false;
+        $this->objTemplate->error          = false;
 
-        $objExtern = $this->Database
+        $objExtern = \Database::getInstance()
             ->prepare('SELECT address, path FROM tl_synccto_clients WHERE id=?')
             ->execute($this->intClientID);
 
-        $this->Template->clientPath = $objExtern->address . $objExtern->path;
-        $this->Template->serverPath = $this->Environment->base;
+        $this->objTemplate->clientPath = $objExtern->address . $objExtern->path;
+        $this->objTemplate->serverPath = \Environment::get('base');
     }
 
     /**
@@ -256,8 +305,8 @@ class SyncCtoPopupDB extends Backend
             );
         }
 
-        // Make a lookup in synccto language files
-        if (is_array($GLOBALS['TL_LANG']['tl_syncCto_database']) && key_exists($strName, $GLOBALS['TL_LANG']['tl_syncCto_database']))
+        // Make a lookup in syncCto language files
+        if (is_array($GLOBALS['TL_LANG']['tl_syncCto_database']) && array_key_exists($strName, $GLOBALS['TL_LANG']['tl_syncCto_database']))
         {
             if (is_array($GLOBALS['TL_LANG']['tl_syncCto_database'][$strName]))
             {
@@ -270,7 +319,7 @@ class SyncCtoPopupDB extends Backend
         }
 
         // Get MM name
-        if (in_array('metamodels', $this->Config->getActiveModules()) && preg_match("/^mm_/i", $strName))
+        if (in_array('metamodels', \Config::getInstance()->getActiveModules()) && preg_match("/^mm_/i", $strName))
         {
             try
             {
@@ -302,7 +351,7 @@ class SyncCtoPopupDB extends Backend
         }
 
         // Little mapping for names        
-        if (is_array($GLOBALS['SYC_CONFIG']['database_mapping']) && key_exists($strName, $GLOBALS['SYC_CONFIG']['database_mapping']))
+        if (is_array($GLOBALS['SYC_CONFIG']['database_mapping']) && array_key_exists($strName, $GLOBALS['SYC_CONFIG']['database_mapping']))
         {
             $strRealSystemName = $GLOBALS['SYC_CONFIG']['database_mapping'][$strName];
 
@@ -358,127 +407,6 @@ class SyncCtoPopupDB extends Backend
             );
         }
     }
-
-    /**
-     * Close popup and go throug next syncCto step
-     */
-    public function showClose()
-    {
-        $this->Template           = new BackendTemplate("be_syncCto_database");
-        $this->Template->headline = $GLOBALS['TL_LANG']['MSC']['backBT'];
-        $this->Template->close    = true;
-        $this->Template->error    = false;
-    }
-
-    /**
-     * Show errors
-     */
-    public function showError()
-    {
-        $this->Template           = new BackendTemplate("be_syncCto_database");
-        $this->Template->headline = $GLOBALS['TL_LANG']['MSC']['error'];
-        $this->Template->arrError = $this->arrErrors;
-        $this->Template->text     = $GLOBALS['TL_LANG']['ERR']['general'];
-        $this->Template->close    = false;
-        $this->Template->error    = true;
-    }
-
-    /**
-     * Output templates
-     */
-    public function output()
-    {
-        // Clear all we want a clear array for this windows.
-        $GLOBALS['TL_CSS']        = array();
-        $GLOBALS['TL_JAVASCRIPT'] = array();
-
-        // Set stylesheets
-        $GLOBALS['TL_CSS'][] = 'system/themes/' . $this->getTheme() . '/basic.css';
-        $GLOBALS['TL_CSS'][] = 'system/modules/syncCto/assets/css/compare.css';
-
-        // Set javascript
-        $GLOBALS['TL_JAVASCRIPT'][] = 'assets/mootools/core/' . MOOTOOLS . '/mootools-core.js';
-        $GLOBALS['TL_JAVASCRIPT'][] = 'assets/mootools/core/' . MOOTOOLS . '/mootools-more.js';
-        $GLOBALS['TL_JAVASCRIPT'][] = 'assets/mootools/mootao/Mootao.js';
-        $GLOBALS['TL_JAVASCRIPT'][] = 'assets/contao/js/core.js';
-        $GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/syncCto/assets/js/compare.js';
-
-        // Set wrapper template information
-        $this->popupTemplate           = new BackendTemplate("be_syncCto_popup");
-        $this->popupTemplate->theme    = $this->getTheme();
-        $this->popupTemplate->base     = $this->Environment->base;
-        $this->popupTemplate->language = $GLOBALS['TL_LANGUAGE'];
-        $this->popupTemplate->title    = $GLOBALS['TL_CONFIG']['websiteTitle'];
-        $this->popupTemplate->charset  = $GLOBALS['TL_CONFIG']['characterSet'];
-        $this->popupTemplate->headline = basename(utf8_convert_encoding($this->strFile, $GLOBALS['TL_CONFIG']['characterSet']));
-
-
-        // Set default information
-        $this->Template->id        = $this->intClientID;
-        $this->Template->step      = $this->mixStep;
-        $this->Template->direction = $this->strMode;
-
-        // Output template
-        $this->popupTemplate->content = $this->Template->parse();
-        $this->popupTemplate->output();
-    }
-
-    // Helper functions --------------------------------------------------------
-
-    /**
-     * Initianize get parameter
-     */
-    protected function initGetParams()
-    {
-        // Get Client id
-        if (strlen(\Input::getInstance()->get('id')) != 0)
-        {
-            $this->intClientID = intval(\Input::getInstance()->get('id'));
-        }
-        else
-        {
-            $this->mixStep = self::STEP_ERROR_DB;
-            return;
-        }
-
-        // Get next step
-        if (strlen(\Input::getInstance()->get('step')) != 0)
-        {
-            $this->mixStep = \Input::getInstance()->get('step');
-        }
-        else
-        {
-            $this->mixStep = self::STEP_NORMAL_DB;
-        }
-
-        // Get direction
-        if (strlen(\Input::getInstance()->get('direction')) != 0)
-        {
-            $this->strMode = \Input::getInstance()->get('direction');
-        }
-
-    }
-
-    protected function loadSyncSettings()
-    {
-        $this->arrSyncSettings = \Session::getInstance()->get("syncCto_SyncSettings_" . $this->intClientID);
-
-        if (!is_array($this->arrSyncSettings))
-        {
-            $this->arrSyncSettings = array();
-        }
-    }
-
-    protected function saveSyncSettings()
-    {
-        if (!is_array($this->arrSyncSettings))
-        {
-            $this->arrSyncSettings = array();
-        }
-
-        \Session::getInstance()->set("syncCto_SyncSettings_" . $this->intClientID, $this->arrSyncSettings);
-    }
-
 }
 
 /**
