@@ -56,9 +56,6 @@
 				"languages_cto": "system/modules/syncCto/languages",
 				"languages_tx": ".tx"
 			}
-		},
-		"branch-alias":{
-			"dev-contao3": "2.6.x-dev"
 		}
 	}
 }
