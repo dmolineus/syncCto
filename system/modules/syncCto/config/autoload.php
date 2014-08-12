@@ -40,6 +40,7 @@ ClassLoader::addClasses(array
         'SyncCtoHelper'                  => 'system/modules/syncCto/SyncCtoHelper.php',
         'SyncCtoRPCFunctions'            => 'system/modules/syncCto/SyncCtoRPCFunctions.php',
         'SyncCtoStats'                   => 'system/modules/syncCto/SyncCtoStats.php',
+        'SyncCtoFiles'                   => 'system/modules/syncCto/SyncCtoFiles.php',
         'SyncCtoRunOnceEr'               => 'system/modules/syncCto/SyncCtoRunOnceEr.php',
         'SyncCtoTableSyncTo'             => 'system/modules/syncCto/SyncCtoTableSyncTo.php',
         'SyncCtoTableSyncFrom'           => 'system/modules/syncCto/SyncCtoTableSyncFrom.php',
