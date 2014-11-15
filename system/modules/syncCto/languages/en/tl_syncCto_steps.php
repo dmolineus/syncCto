@@ -48,10 +48,12 @@ $GLOBALS['TL_LANG']['tl_syncCto_sync']['step_5']['description_2']           = 'I
 $GLOBALS['TL_LANG']['tl_syncCto_sync']['step_5']['description_3']           = ' file(s) skipped.';
 $GLOBALS['TL_LANG']['tl_syncCto_sync']['step_5']['description_4']           = ' file(s) sent.';
 $GLOBALS['TL_LANG']['tl_syncCto_sync']['step_5']['description_5']           = ' file(s) waiting.';
+$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_5']['description_11']          = ' file(s) deleted.';
 $GLOBALS['TL_LANG']['tl_syncCto_sync']['step_5']['description_6']           = 'Transferred files:';
 $GLOBALS['TL_LANG']['tl_syncCto_sync']['step_5']['description_7']           = 'Deleted files:';
 $GLOBALS['TL_LANG']['tl_syncCto_sync']['step_5']['description_8']           = 'Incorrect files:';
 $GLOBALS['TL_LANG']['tl_syncCto_sync']['step_5']['description_9']           = 'Deleted folders:';
+$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_5']['description_10']          = 'Waiting files:';
 
 $GLOBALS['TL_LANG']['tl_syncCto_sync']['abort']                             = 'Abort the synchronization and clean up the client.';
 $GLOBALS['TL_LANG']['tl_syncCto_sync']['complete_client']                   = 'The synchronization of the %sclient%s was successfully completed.';

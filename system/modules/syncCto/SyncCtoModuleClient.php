@@ -3281,15 +3281,18 @@ class SyncCtoModuleClient extends BackendModule
                  * Show information
                  */
                 case 6:
+                    // Output.
+                    $objSummary = new \BackendTemplate('be_syncCto_popup_summary');
+
+                    $intSkippCount = 0;
+                    $intSendCount  = 0;
+                    $intWaitCount  = 0;
+                    $intDelCount   = 0;
+                    $intSplitCount = 0;
+
                     // Count files
                     if (is_array($this->arrListCompare) && (count($this->arrListCompare['core']) != 0 || count($this->arrListCompare['files']) != 0))
                     {
-                        $intSkippCount = 0;
-                        $intSendCount  = 0;
-                        $intWaitCount  = 0;
-                        $intDelCount   = 0;
-                        $intSplitCount = 0;
-
                         foreach($this->arrListCompare as $strType => $arrLists)
                         {
                             foreach ($arrLists as $key => $value)
@@ -3321,6 +3324,13 @@ class SyncCtoModuleClient extends BackendModule
                             }
                         }
                     }
+
+                    // Add counter.
+                    $objSummary->intSkippCount = $intSkippCount;
+                    $objSummary->intSendCount  = $intSendCount;
+                    $objSummary->intWaitCount  = $intWaitCount;
+                    $objSummary->intDelCount   = $intDelCount;
+                    $objSummary->intSplitCount = $intSplitCount;
 
                     // Hide control div
                     $this->Template->showControl     = false;
@@ -3360,236 +3370,9 @@ class SyncCtoModuleClient extends BackendModule
                         $this->booFinished = true;
                     }
 
-                    $compare = '';
+                    $objSummary->arrListCompare = $this->arrListCompare;
 
-                    // Check if there are some skipped files
-                    if ($intSkippCount != 0)
-                    {
-                        $compare .= '<br /><p class="tl_help">' . $intSkippCount . $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_3'] . '</p>';
-
-                        $arrSort = array();
-
-                        foreach($this->arrListCompare as $strType => $arrLists)
-                        {
-                            foreach ($arrLists as $value)
-                            {
-                                if ($value["transmission"] != SyncCtoEnum::FILETRANS_SKIPPED)
-                                {
-                                    continue;
-                                }
-
-                                $skipreason = preg_replace("/(RPC Call:.*|\<br\>|\<br\/\>)/i", " ", $value["skipreason"]);
-
-                                $arrSort[$skipreason][] = $value;
-                            }
-                        }
-
-                        $compare .= '<ul class="fileinfo">';
-                        foreach ($arrSort as $strMsg => $arrFiles)
-                        {
-                            $compare .= "<li>";
-                            $compare .= '<strong>' . $strMsg . '</strong>';
-                            $compare .= "<ul>";
-                            foreach ($arrFiles as $arrFile)
-                            {
-                                $compare .= sprintf('<li title="%s">%s</li>',$arrFile['error'], $arrFile['path']);
-                            }
-                            $compare .= "</ul>";
-                            $compare .= "</li>";
-                        }
-                        $compare .= "</ul>";
-                    }
-
-                    // Write some information about the dbafs.
-                    if (is_array($this->arrListCompare) && count($this->arrListCompare['files']) != 0)
-                    {
-                        $arrDbafsFiles = array();
-                        foreach ($this->arrListCompare['files'] as $value)
-                        {
-                            // Skip files without the dbafs information and no problems with the dbafs.
-                            if (!isset($value['dbafs']) || $value['dbafs']['state'] != SyncCtoEnum::DBAFS_CONFLICT)
-                            {
-                                continue;
-                            }
-
-                            // Add entries to the list.
-                            $arrDbafsFiles[$value['dbafs']['msg']][] = $value;
-                        }
-
-                        $compare .= '<ul class="dbafs_info">';
-                        $compare .= '<li class="tl_help">';
-
-                        if (count($arrDbafsFiles) == 0)
-                        {
-                            $compare .= $GLOBALS['TL_LANG']['MSC']['dbafs_all_green'];
-                        }
-                        else
-                        {
-                            $compare .= $GLOBALS['TL_LANG']['ERR']['dbafs_error'];
-
-                            $compare .= '<ul>';
-
-                            foreach($arrDbafsFiles as $strMsg => $arrFiles)
-                            {
-                                $compare .= '<li class="tl_help">';
-                                $compare .= sprintf('<p class="tl_help">%s</p>', $strMsg);
-                                $compare .= '<ul>';
-
-                                foreach($arrFiles as $arrFile)
-                                {
-                                    $compare .= sprintf('<li title="%s">', $arrFile['dbafs']['error']);
-                                    $compare .= $arrFile['path'];
-                                    $compare .= '</li>';
-                                }
-
-                                $compare .= '</ul>';
-                                $compare .= '</li>';
-                            }
-                            $compare .= '</ul>';
-                        }
-
-                        $compare .= "</li>";
-                        $compare .= "</ul>";
-                    }
-
-                    // Show file list only in debug mode
-                    if ($GLOBALS['TL_CONFIG']['syncCto_debug_mode'] == true)
-                    {
-                        if (is_array($this->arrListCompare) && (count($this->arrListCompare['core']) != 0 || count($this->arrListCompare['files']) != 0))
-                        {
-                            $compare .= '<br /><p class="tl_help">' . $intSendCount . $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_4'] . '</p>';
-
-                            if (($intSendCount - $intDelCount) != 0)
-                            {
-                                $compare .= '<ul class="fileinfo">';
-
-                                $compare .= "<li>";
-                                $compare .= '<strong>' . $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_6'] . '</strong>';
-                                $compare .= "<ul>";
-
-                                foreach($this->arrListCompare as $strType => $arrLists)
-                                {
-                                    foreach ($arrLists as $key => $value)
-                                    {
-                                        if ($value["transmission"] != SyncCtoEnum::FILETRANS_SEND)
-                                        {
-                                            continue;
-                                        }
-
-                                        if ($value["state"] == SyncCtoEnum::FILESTATE_DELETE)
-                                        {
-                                            continue;
-                                        }
-
-                                        $compare .= "<li>";
-                                        $compare .= (mb_check_encoding($value["path"], 'UTF-8')) ? $value["path"] : utf8_encode($value["path"]);
-                                        $compare .= "</li>";
-                                    }
-                                }
-                                $compare .= "</ul>";
-                                $compare .= "</li>";
-                                $compare .= "</ul>";
-                            }
-
-                            if ($intDelCount != 0)
-                            {
-                                $compare .= '<ul class="fileinfo">';
-
-                                $compare .= "<li>";
-                                $compare .= '<strong>' . $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_7'] . '</strong>';
-                                $compare .= "<ul>";
-
-                                $compare .= "<li>";
-                                $compare .= '<strong>' . $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_7'] . '</strong>';
-                                $compare .= "<ul>";
-
-                                foreach($this->arrListCompare as $strType => $arrLists)
-                                {
-                                    foreach ($arrLists as $key => $value)
-                                    {
-                                        if ($value["transmission"] != SyncCtoEnum::FILETRANS_SEND)
-                                        {
-                                            continue;
-                                        }
-
-                                        if ($value["state"] != SyncCtoEnum::FILESTATE_DELETE)
-                                        {
-                                            continue;
-                                        }
-
-                                        $compare .= "<li>";
-                                        $compare .= (mb_check_encoding($value["path"], 'UTF-8')) ? $value["path"] : utf8_encode($value["path"]);
-                                        $compare .= "</li>";
-                                    }
-                                }
-
-                                $compare .= "</ul>";
-                                $compare .= "</li>";
-
-                                $compare .= "<li>";
-                                $compare .= '<strong>' . $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_9'] . '</strong>';
-                                $compare .= "<ul>";
-
-                                foreach($this->arrListCompare as $strType => $arrLists)
-                                {
-                                    foreach ($arrLists as $key => $value)
-                                    {
-                                        if ($value["transmission"] != SyncCtoEnum::FILETRANS_SEND)
-                                        {
-                                            continue;
-                                        }
-
-                                        if ($value["state"] != SyncCtoEnum::FILESTATE_FOLDER_DELETE)
-                                        {
-                                            continue;
-                                        }
-
-                                        $compare .= "<li>";
-                                        $compare .= (mb_check_encoding($value["path"], 'UTF-8')) ? $value["path"] : utf8_encode($value["path"]);
-                                        $compare .= "</li>";
-                                    }
-                                }
-
-                                $compare .= "</ul>";
-                                $compare .= "</li>";
-
-                                $compare .= "</ul>";
-                                $compare .= "</li>";
-                                $compare .= "</ul>";
-                            }
-
-                            // Not send and still waiting
-                            if ($intWaitCount != 0)
-                            {
-                                $compare .= '<br /><p class="tl_help">' . $intWaitCount . $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_5'] . '</p>';
-                                $compare .= '<ul class="fileinfo">';
-                                $compare .= "<li>";
-                                $compare .= '<strong>' . $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_8'] . '</strong>';
-                                $compare .= "<ul>";
-
-                                foreach($this->arrListCompare as $strType => $arrLists)
-                                {
-                                    foreach ($arrLists as $key => $value)
-                                    {
-                                        if ($value["transmission"] != SyncCtoEnum::FILETRANS_WAITING)
-                                        {
-                                            continue;
-                                        }
-
-                                        $compare .= "<li>";
-                                        $compare .= (mb_check_encoding($value["path"], 'UTF-8')) ? $value["path"] : utf8_encode($value["path"]);
-                                        $compare .= "</li>";
-                                    }
-                                }
-
-                                $compare .= "</ul>";
-                                $compare .= "</li>";
-                                $compare .= "</ul>";
-                            }
-                        }
-                    }
-
-                    $this->objData->setHtml($compare);
+                    $this->objData->setHtml($objSummary->parse());
 
                     // Set finished msg
                     $arrClientLink = $this->Database

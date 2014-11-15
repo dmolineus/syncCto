@@ -12,7 +12,8 @@
 /**
  * Register the classes
  */
-ClassLoader::addClasses(array
+ClassLoader::addClasses(
+    array
     (
         'CronDbBackups'               => 'system/modules/syncCto/cron/CronDbBackups.php',
         'CronDeleteDbBackups'         => 'system/modules/syncCto/cron/CronDeleteDbBackups.php',
@@ -50,18 +51,20 @@ ClassLoader::addClasses(array
 /**
  * Register the templates
  */
-TemplateLoader::addFiles(array
+TemplateLoader::addFiles(
+    array
     (
-        'be_syncCto_files'      => 'system/modules/syncCto/templates',
-        'be_syncCto_popup'      => 'system/modules/syncCto/templates',
-        'be_syncCto_backup'     => 'system/modules/syncCto/templates',
-        'be_syncCto_attention'  => 'system/modules/syncCto/templates',
-        'be_syncCto_legend'     => 'system/modules/syncCto/templates',
-        'be_syncCto_smallCheck' => 'system/modules/syncCto/templates',
-        'be_syncCto_form'       => 'system/modules/syncCto/templates',
-        'be_syncCto_error'      => 'system/modules/syncCto/templates',
-        'be_syncCto_steps'      => 'system/modules/syncCto/templates',
-        'be_syncCto_check'      => 'system/modules/syncCto/templates',
-        'be_syncCto_database'   => 'system/modules/syncCto/templates',
+        'be_syncCto_files'         => 'system/modules/syncCto/templates',
+        'be_syncCto_popup'         => 'system/modules/syncCto/templates',
+        'be_syncCto_backup'        => 'system/modules/syncCto/templates',
+        'be_syncCto_attention'     => 'system/modules/syncCto/templates',
+        'be_syncCto_legend'        => 'system/modules/syncCto/templates',
+        'be_syncCto_smallCheck'    => 'system/modules/syncCto/templates',
+        'be_syncCto_form'          => 'system/modules/syncCto/templates',
+        'be_syncCto_error'         => 'system/modules/syncCto/templates',
+        'be_syncCto_steps'         => 'system/modules/syncCto/templates',
+        'be_syncCto_check'         => 'system/modules/syncCto/templates',
+        'be_syncCto_database'      => 'system/modules/syncCto/templates',
+        'be_syncCto_popup_summary' => 'system/modules/syncCto/templates',
     )
 );

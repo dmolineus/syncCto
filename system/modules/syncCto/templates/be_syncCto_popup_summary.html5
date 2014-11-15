@@ -1,0 +1,214 @@
+<?php if ( $this->intSkippCount != 0 ): ?>
+    <br/>
+    <p class="tl_help">
+        <?php echo $this->intSkippCount; ?> <?php echo $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_3']; ?>
+    </p>
+<?php endif; ?>
+
+<?php if ( $this->arrListCompare ): ?>
+    <?php
+    $arrDbafsFiles = array();
+    foreach ( $this->arrListCompare['files'] as $value )
+    {
+        // Skip files without the dbafs information and no problems with the dbafs.
+        if ( !isset($value['dbafs']) || $value['dbafs']['state'] != SyncCtoEnum::DBAFS_CONFLICT )
+        {
+            continue;
+        }
+
+        // Add entries to the list.
+        $arrDbafsFiles[$value['dbafs']['msg']][] = $value;
+    }
+    ?>
+
+    <ul class="dbafs_info">
+        <li class="tl_help">
+            <?php if ( count($arrDbafsFiles) == 0 ): ?>
+                <?php echo $GLOBALS['TL_LANG']['MSC']['dbafs_all_green']; ?>
+            <?php else: ?>
+                <?php echo $GLOBALS['TL_LANG']['ERR']['dbafs_error']; ?>
+                <ul>
+                    <?php foreach ( $arrDbafsFiles as $strMsg => $arrFiles ): ?>
+                        <li class="tl_help">
+                            <p class="tl_help"> <?php echo $strMsg; ?>   </p>
+                            <ul>
+                                <?php foreach ( $arrFiles as $arrFile ): ?>
+                                    <li title="<?php echo $arrFile['dbafs']['error']; ?>">
+                                        (i) <?php echo $arrFile['path']; ?>
+                                    </li>
+                                <?php endforeach; ?>
+                            </ul>
+                        </li>
+                    <?php endforeach; ?>
+                </ul>
+            <?php endif; ?>
+        </li>
+    </ul>
+<?php endif; ?>
+
+    <br/>
+
+<?php if ( true || $GLOBALS['TL_CONFIG']['syncCto_debug_mode'] ): ?>
+
+    <strong>
+        <?php echo $GLOBALS['TL_LANG']['tl_syncCto_sync']['step_5']['description_6']; ?>
+        <span class="tl_help">
+            (<?php echo $this->intSendCount; ?> <?php echo $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_4']; ?>
+            )
+        </span>
+    </strong>
+
+    <ul class="fileinfo send">
+        <?php if ( $this->intSendCount != 0 ): ?>
+            <?php foreach ( $this->arrListCompare as $strType => $arrLists ): ?>
+                <?php foreach ( $arrLists as $key => $value ): ?>
+                    <?php if ( $value["transmission"] != SyncCtoEnum::FILETRANS_SEND ) : ?>
+                        <?php continue; ?>
+                    <?php endif; ?>
+                    <li>
+                        <?php if ( mb_check_encoding($value["path"], 'UTF-8') ): ?>
+                            <?php echo $value["path"]; ?>
+                        <?php else: ?>
+                            <?php echo utf8_encode($value["path"]); ?>
+                        <?php endif; ?>
+                    </li>
+                <?php endforeach; ?>
+            <?php endforeach; ?>
+        <?php else: ?>
+            <li>-</li>
+        <?php endif; ?>
+    </ul>
+    <br/>
+
+    <strong>
+        <?php echo $GLOBALS['TL_LANG']['tl_syncCto_sync']['step_5']['description_8']; ?>
+        <span class="tl_help">
+            (<?php echo $this->intSkippCount; ?> <?php echo $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_3']; ?>
+            )
+        </span>
+    </strong>
+
+    <ul class="fileinfo skip">
+        <?php if ( $this->intSkippCount != 0 ): ?>
+            <?php foreach ( $this->arrListCompare as $strType => $arrLists ): ?>
+                <?php foreach ( $arrLists as $key => $value ): ?>
+                    <?php if ( $value["transmission"] != SyncCtoEnum::FILETRANS_SKIPPED ) : ?>
+                        <?php continue; ?>
+                    <?php endif; ?>
+                    <li title="<?php echo $value["skipreason"]; ?>"> (i)
+                        <?php if ( mb_check_encoding($value["path"], 'UTF-8') ): ?>
+                            <?php echo $value["path"]; ?>
+                        <?php else: ?>
+                            <?php echo utf8_encode($value["path"]); ?>
+                        <?php endif; ?>
+                    </li>
+                <?php endforeach; ?>
+            <?php endforeach; ?>
+        <?php else: ?>
+            <li>-</li>
+        <?php endif; ?>
+    </ul>
+    <br/>
+
+    <strong>
+        <?php echo $GLOBALS['TL_LANG']['tl_syncCto_sync']['step_5']['description_10']; ?>
+        <span class="tl_help">
+            (<?php echo $this->intWaitCount; ?> <?php echo $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_5']; ?>
+            )
+        </span>
+    </strong>
+
+    <ul class="fileinfo wait">
+        <?php if ( $this->intWaitCount != 0 ): ?>
+            <?php foreach ( $this->arrListCompare as $strType => $arrLists ): ?>
+                <?php foreach ( $arrLists as $key => $value ): ?>
+                    <?php if ( $value["transmission"] != SyncCtoEnum::FILETRANS_WAITING ): ?>
+                        <?php continue; ?>
+                    <?php endif; ?>
+                    <li>
+                        <?php if ( mb_check_encoding($value["path"], 'UTF-8') ): ?>
+                            <?php echo $value["path"]; ?>
+                        <?php else: ?>
+                            <?php echo utf8_encode($value["path"]); ?>
+                        <?php endif; ?>
+                    </li>
+                <?php endforeach; ?>
+            <?php endforeach; ?>
+        <?php else: ?>
+            <li>-</li>
+        <?php endif; ?>
+    </ul>
+    <br/>
+
+    <strong>
+        <?php echo $GLOBALS['TL_LANG']['tl_syncCto_sync']['step_5']['description_7']; ?>
+        <span class="tl_help">
+            (<?php echo $this->intDelCount; ?> <?php echo $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_11']; ?>
+            )
+        </span>
+    </strong>
+
+    <ul class="fileinfo">
+        <?php if ( $this->intDelCount != 0 ): ?>
+            <?php foreach ( $this->arrListCompare as $strType => $arrLists ): ?>
+                <?php foreach ( $arrLists as $key => $value ): ?>
+                    <?php if ( $value["state"] != SyncCtoEnum::FILESTATE_DELETE ) : ?>
+                        <?php continue; ?>
+                    <?php endif; ?>
+                    <li>
+                        <?php if ( mb_check_encoding($value["path"], 'UTF-8') ): ?>
+                            <?php echo $value["path"]; ?>
+                        <?php else: ?>
+                            <?php echo utf8_encode($value["path"]); ?>
+                        <?php endif; ?>
+                    </li>
+                <?php endforeach; ?>
+            <?php endforeach; ?>
+        <?php else: ?>
+            <li>-</li>
+        <?php endif; ?>
+    </ul>
+
+<?php endif; ?>
+
+
+<?php
+
+// Check if there are some skipped files
+if ( $intSkippCount != 0 )
+{
+    $compare .= '<br /><p class="tl_help">' . $intSkippCount . $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_3'] . '</p>';
+
+    $arrSort = array();
+
+    foreach ( $this->arrListCompare as $strType => $arrLists )
+    {
+        foreach ( $arrLists as $value )
+        {
+            if ( $value["transmission"] != SyncCtoEnum::FILETRANS_SKIPPED )
+            {
+                continue;
+            }
+
+            $skipreason = preg_replace("/(RPC Call:.*|\<br\>|\<br\/\>)/i", " ", $value["skipreason"]);
+
+            $arrSort[$skipreason][] = $value;
+        }
+    }
+
+    $compare .= '<ul class="fileinfo">';
+    foreach ( $arrSort as $strMsg => $arrFiles )
+    {
+        $compare .= "<li>";
+        $compare .= '<strong>' . $strMsg . '</strong>';
+        $compare .= "<ul>";
+        foreach ( $arrFiles as $arrFile )
+        {
+            $compare .= sprintf('<li title="%s">%s</li>', $arrFile['error'], $arrFile['path']);
+        }
+        $compare .= "</ul>";
+        $compare .= "</li>";
+    }
+    $compare .= "</ul>";
+}
+
