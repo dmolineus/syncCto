@@ -668,6 +668,44 @@ $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_DBAFS_INFORMATION"] = array
     "parameter"          => array("files"),
 );
 
+// - Maintenance ---------------------------------------------------------------
+
+// Contao internal cache.
+$GLOBALS['CTOCOM_FUNCTIONS']['SYNCCTO_PURGE_CACHE'] = array
+(
+    'class'              => 'SyncCto\RPC\Client',
+    'function'           => 'automatorPurgeInternalCache',
+    'typ'                => 'GET',
+    'parameter'          => FALSE
+);
+
+// Contao internal cache.
+$GLOBALS['CTOCOM_FUNCTIONS']['SYNCCTO_CREATE_CACHE'] = array
+(
+    'class'              => 'SyncCto\RPC\Client',
+    'function'           => 'automatorCreateInternalCache',
+    'typ'                => 'GET',
+    'parameter'          => FALSE
+);
+
+// Run maintenance.
+$GLOBALS['CTOCOM_FUNCTIONS']['SYNCCTO_MAINTENANCE'] = array
+(
+    'class'              => 'SyncCto\RPC\Client',
+    'function'           => 'maintenance',
+    'typ'                => 'POST',
+    'parameter'          => array('options')
+);
+
+// Clear temp folder.
+$GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_PURGETEMP"] = array
+(
+    'class'              => 'SyncCto\RPC\Client',
+    'function'           => 'maintenancePurgeTemp',
+    'typ'                => 'GET',
+    'parameter'          => FALSE
+);
+
 // - Miscellaneous -------------------------------------------------------------
 
 // Set displayErrors Flag
@@ -686,42 +724,6 @@ $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_SET_ATTENTION_FLAG"] = array
     "function"           => "setAttentionFlag",
     "typ"                => "POST",
     "parameter"          => array("state"),
-);
-
-// Clear temp folder
-$GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_PURGETEMP"] = array
-(
-    "class"              => "SyncCtoFiles",
-    "function"           => "purgeTemp",
-    "typ"                => "GET",
-    "parameter"          => FALSE,
-);
-
-// Contao Cache.
-$GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_PURGE_CACHE"] = array
-(
-    "class"              => "SyncCtoContaoAutomator",
-    "function"           => "purgeInternalCache",
-    "typ"                => "GET",
-    "parameter"          => FALSE,
-);
-
-// Contao Cache.
-$GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_CREATE_CACHE"] = array
-(
-    "class"              => "SyncCtoContaoAutomator",
-    "function"           => "createInternalCache",
-    "typ"                => "GET",
-    "parameter"          => FALSE,
-);
-
-// Run maintenance
-$GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_MAINTENANCE"] = array
-(
-    "class"              => "SyncCtoFiles",
-    "function"           => "runMaintenance",
-    "typ"                => "POST",
-    "parameter"          => array("options"),
 );
 
 // Execute last step operations
