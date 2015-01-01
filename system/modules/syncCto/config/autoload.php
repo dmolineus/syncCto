@@ -3,68 +3,84 @@
 /**
  * Contao Open Source CMS
  *
- * @copyright  MEN AT WORK 2014
- * @package    syncCto
- * @license    GNU/LGPL
- * @filesource
+ * Copyright (c) 2005-2014 Leo Feyer
+ *
+ * @package SyncCto
+ * @link    https://contao.org
+ * @license http://www.gnu.org/licenses/lgpl-3.0.html LGPL
  */
+
+
+/**
+ * Register the namespaces
+ */
+ClassLoader::addNamespaces(array
+(
+	'SyncCto',
+));
+
 
 /**
  * Register the classes
  */
-ClassLoader::addClasses(
-    array
-    (
-        'CronDbBackups'               => 'system/modules/syncCto/cron/CronDbBackups.php',
-        'CronDeleteDbBackups'         => 'system/modules/syncCto/cron/CronDeleteDbBackups.php',
-        'CronFileBackups'             => 'system/modules/syncCto/cron/CronFileBackups.php',
-        'CronDeleteFileBackups'       => 'system/modules/syncCto/cron/CronDeleteFileBackups.php',
-        'SyncCtoAjax'                 => 'system/modules/syncCto/SyncCtoAjax.php',
-        'SyncCtoFiles'                => 'system/modules/syncCto/SyncCtoFiles.php',
-        'SyncCtoFilterIteratorBase'   => 'system/modules/syncCto/SyncCtoFilterIteratorBase.php',
-        'SyncCtoFilterIteratorFiles'  => 'system/modules/syncCto/SyncCtoFilterIteratorFiles.php',
-        'SyncCtoFilterIteratorFolder' => 'system/modules/syncCto/SyncCtoFilterIteratorFolder.php',
-        'SyncCtoCommunicationClient'  => 'system/modules/syncCto/SyncCtoCommunicationClient.php',
-        'SyncCtoDatabase'             => 'system/modules/syncCto/SyncCtoDatabase.php',
-        'SyncCtoEnum'                 => 'system/modules/syncCto/SyncCtoEnum.php',
-        'SyncCtoUpdater'              => 'system/modules/syncCto/SyncCtoUpdater.php',
-        'SyncCtoDatabaseUpdater'      => 'system/modules/syncCto/SyncCtoDatabaseUpdater.php',
-        'SyncCtoModuleBackup'         => 'system/modules/syncCto/SyncCtoModuleBackup.php',
-        'SyncCtoModuleCheck'          => 'system/modules/syncCto/SyncCtoModuleCheck.php',
-        'SyncCtoModuleClient'         => 'system/modules/syncCto/SyncCtoModuleClient.php',
-        'InterfaceSyncCtoStep'        => 'system/modules/syncCto/InterfaceSyncCtoStep.php',
-        'GeneralDataSyncCto'          => 'system/modules/syncCto/GeneralDataSyncCto.php',
-        'SyncCtoHelper'               => 'system/modules/syncCto/SyncCtoHelper.php',
-        'SyncCtoRPCFunctions'         => 'system/modules/syncCto/SyncCtoRPCFunctions.php',
-        'SyncCtoStats'                => 'system/modules/syncCto/SyncCtoStats.php',
-        'SyncCtoRunOnceEr'            => 'system/modules/syncCto/SyncCtoRunOnceEr.php',
-        'SyncCtoTableSyncTo'          => 'system/modules/syncCto/SyncCtoTableSyncTo.php',
-        'SyncCtoTableSyncFrom'        => 'system/modules/syncCto/SyncCtoTableSyncFrom.php',
-        'SyncCtoTableSettings'        => 'system/modules/syncCto/SyncCtoTableSettings.php',
-        'StepPool'                    => 'system/modules/syncCto/StepPool.php',
-        'ContentData'                 => 'system/modules/syncCto/ContentData.php',
-        'SyncCtoContaoAutomator'      => 'system/modules/syncCto/SyncCtoContaoAutomator.php'
-    )
-);
+ClassLoader::addClasses(array
+(
+	'SyncCtoUpdater'                                     => 'system/modules/syncCto/SyncCtoUpdater.php',
+	'SyncCtoModuleCheck'                                 => 'system/modules/syncCto/SyncCtoModuleCheck.php',
+	'SyncCtoTableSyncTo'                                 => 'system/modules/syncCto/SyncCtoTableSyncTo.php',
+	'InterfaceSyncCtoStep'                               => 'system/modules/syncCto/InterfaceSyncCtoStep.php',
+	'SyncCtoPopupFiles'                                  => 'system/modules/syncCto/SyncCtoPopupFiles.php',
+	'SyncCtoAjax'                                        => 'system/modules/syncCto/SyncCtoAjax.php',
+	'SyncCtoTableSyncFrom'                               => 'system/modules/syncCto/SyncCtoTableSyncFrom.php',
+	'SyncCtoDatabase'                                    => 'system/modules/syncCto/SyncCtoDatabase.php',
+	'SyncCtoRunOnceEr'                                   => 'system/modules/syncCto/SyncCtoRunOnceEr.php',
+	'SyncCtoPopupDB'                                     => 'system/modules/syncCto/SyncCtoPopupDB.php',
+	'SyncCtoCommunicationClient'                         => 'system/modules/syncCto/SyncCtoCommunicationClient.php',
+	'SyncCtoModuleBackup'                                => 'system/modules/syncCto/SyncCtoModuleBackup.php',
+	'GeneralDataSyncCto'                                 => 'system/modules/syncCto/GeneralDataSyncCto.php',
+	'SyncCtoHelper'                                      => 'system/modules/syncCto/SyncCtoHelper.php',
+	// Src
+	'SyncCto\Core\Helper'                                => 'system/modules/syncCto/src/Core/Helper.php',
+	'SyncCto\Core\Environment\Environment'               => 'system/modules/syncCto/src/Core/Environment/Environment.php',
+	'SyncCto\Core\Environment\DefaultEnvironmentBuilder' => 'system/modules/syncCto/src/Core/Environment/DefaultEnvironmentBuilder.php',
+	'SyncCto\Core\Environment\IEnvironmentBuilder'       => 'system/modules/syncCto/src/Core/Environment/IEnvironmentBuilder.php',
+	'SyncCto\Core\Environment\IEnvironment'              => 'system/modules/syncCto/src/Core/Environment/IEnvironment.php',
+	'SyncCto\Core\Config'                                => 'system/modules/syncCto/src/Core/Config.php',
+	'SyncCto\Core\FactoryEnvironment'                    => 'system/modules/syncCto/src/Core/FactoryEnvironment.php',
+	'SyncCto\Database\MySqlTrigger'                      => 'system/modules/syncCto/src/Database/MySqlTrigger.php',
+	'SyncCto\Contao\Database\Updater'                    => 'system/modules/syncCto/src/Contao/Database/Updater.php',
+	'SyncCto\Contao\Maintenance\Automator'               => 'system/modules/syncCto/src/Contao/Maintenance/Automator.php',
+	'SyncCto\Contao\Maintenance\Maintenance'             => 'system/modules/syncCto/src/Contao/Maintenance/Maintenance.php',
+	'SyncCto\Contao\ExecuteHooks'                        => 'system/modules/syncCto/src/Contao/ExecuteHooks.php',
+	'SyncCtoFilterIteratorFiles'                         => 'system/modules/syncCto/SyncCtoFilterIteratorFiles.php',
+	'SyncCtoEnum'                                        => 'system/modules/syncCto/SyncCtoEnum.php',
+	'SyncCtoStats'                                       => 'system/modules/syncCto/SyncCtoStats.php',
+	'SyncCtoFilterIteratorBase'                          => 'system/modules/syncCto/SyncCtoFilterIteratorBase.php',
+	'SyncCtoRPCFunctions'                                => 'system/modules/syncCto/SyncCtoRPCFunctions.php',
+	'StepPool'                                           => 'system/modules/syncCto/StepPool.php',
+	'ContentData'                                        => 'system/modules/syncCto/ContentData.php',
+	'SyncCtoTableSettings'                               => 'system/modules/syncCto/SyncCtoTableSettings.php',
+	'SyncCtoModuleClient'                                => 'system/modules/syncCto/SyncCtoModuleClient.php',
+	'SyncCtoFiles'                                       => 'system/modules/syncCto/SyncCtoFiles.php',
+	'SyncCtoFilterIteratorFolder'                        => 'system/modules/syncCto/SyncCtoFilterIteratorFolder.php',
+));
 
 
 /**
  * Register the templates
  */
-TemplateLoader::addFiles(
-    array
-    (
-        'be_syncCto_files'         => 'system/modules/syncCto/templates',
-        'be_syncCto_popup'         => 'system/modules/syncCto/templates',
-        'be_syncCto_backup'        => 'system/modules/syncCto/templates',
-        'be_syncCto_attention'     => 'system/modules/syncCto/templates',
-        'be_syncCto_legend'        => 'system/modules/syncCto/templates',
-        'be_syncCto_smallCheck'    => 'system/modules/syncCto/templates',
-        'be_syncCto_form'          => 'system/modules/syncCto/templates',
-        'be_syncCto_error'         => 'system/modules/syncCto/templates',
-        'be_syncCto_steps'         => 'system/modules/syncCto/templates',
-        'be_syncCto_check'         => 'system/modules/syncCto/templates',
-        'be_syncCto_database'      => 'system/modules/syncCto/templates',
-        'be_syncCto_popup_summary' => 'system/modules/syncCto/templates',
-    )
-);
+TemplateLoader::addFiles(array
+(
+	'be_syncCto_error'         => 'system/modules/syncCto/templates',
+	'be_syncCto_backup'        => 'system/modules/syncCto/templates',
+	'be_syncCto_popup_summary' => 'system/modules/syncCto/templates',
+	'be_syncCto_attention'     => 'system/modules/syncCto/templates',
+	'be_syncCto_legend'        => 'system/modules/syncCto/templates',
+	'be_syncCto_form'          => 'system/modules/syncCto/templates',
+	'be_syncCto_smallCheck'    => 'system/modules/syncCto/templates',
+	'be_syncCto_check'         => 'system/modules/syncCto/templates',
+	'be_syncCto_popup'         => 'system/modules/syncCto/templates',
+	'be_syncCto_database'      => 'system/modules/syncCto/templates',
+	'be_syncCto_files'         => 'system/modules/syncCto/templates',
+	'be_syncCto_steps'         => 'system/modules/syncCto/templates',
+));
