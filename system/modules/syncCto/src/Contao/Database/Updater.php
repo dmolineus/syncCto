@@ -9,8 +9,27 @@
  * @filesource
  */
 
-class SyncCtoDatabaseUpdater extends \Database\Installer
+namespace SyncCto\Contao\Database;
+
+use Exception;
+use SyncCto\Core\Environment\IEnvironment;
+
+class Updater extends \Database\Installer
 {
+
+    /**
+     * The env. with all objects.
+     *
+     * @var IEnvironment
+     */
+    protected $objEnvironment;
+
+    /**
+     * The current database,
+     *
+     * @var \Database
+     */
+    protected $objDatabase;
 
     /**
      * List with allowed update actions.
@@ -27,14 +46,15 @@ class SyncCtoDatabaseUpdater extends \Database\Installer
     protected $arrError = array();
 
     /**
-     * __construct
+     * @param IEnvironment $objEnvironment The environment.
      */
-    public function __construct()
+    public function __construct($objEnvironment)
     {
         parent::__construct();
 
-        // Load allowed actions from config file.
-        $this->arrAllowedAction = deserialize($GLOBALS['TL_CONFIG']['syncCto_auto_db_updater'], true);
+        $this->objEnvironment   = $objEnvironment;
+        $this->objDatabase      = $this->objEnvironment->getSystemDatabase();
+        $this->arrAllowedAction = $this->objEnvironment->getSyncCtoConfig()->getSettingDatabaseUpdate();
     }
 
     /**
@@ -48,40 +68,40 @@ class SyncCtoDatabaseUpdater extends \Database\Installer
     {
         $sql_command = $this->compileCommands();
 
-        if (empty($sql_command))
+        if ( empty($sql_command) )
         {
             return true;
         }
 
         // Remove not allowed actions
-        foreach ($sql_command as $strAction => $strOperation)
+        foreach ( $sql_command as $strAction => $strOperation )
         {
-            if (!in_array($strAction, $this->arrAllowedAction))
+            if ( !in_array($strAction, $this->arrAllowedAction) )
             {
                 unset($sql_command[$strAction]);
             }
         }
 
-        if (empty($sql_command))
+        if ( empty($sql_command) )
         {
             return true;
         }
 
         // Execute all
-        foreach ($this->arrAllowedAction as $strAction)
+        foreach ( $this->arrAllowedAction as $strAction )
         {
-            if(!isset($sql_command[$strAction]))
+            if ( !isset($sql_command[$strAction]) )
             {
                 continue;
             }
 
-            foreach ($sql_command[$strAction] as $strOperation)
+            foreach ( $sql_command[$strAction] as $strOperation )
             {
                 try
                 {
-                    \Database::getInstance()->query($strOperation);
+                    $this->objDatabase->query($strOperation);
                 }
-                catch (Exception $exc)
+                catch ( Exception $exc )
                 {
                     $this->arrError[$strAction][] = array(
                         'operation' => $strOperation,
@@ -92,7 +112,7 @@ class SyncCtoDatabaseUpdater extends \Database\Installer
             }
         }
 
-        if (empty($this->arrError))
+        if ( empty($this->arrError) )
         {
             return true;
         }
@@ -100,7 +120,7 @@ class SyncCtoDatabaseUpdater extends \Database\Installer
         {
             $strError = '';
 
-            foreach ($this->arrError as $key => $value)
+            foreach ( $this->arrError as $key => $value )
             {
                 $strError .= sprintf("%i. %s. | ", $key + 1, $value['error']);
             }
