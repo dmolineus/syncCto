@@ -8,12 +8,28 @@
  * @license    GNU/LGPL
  * @filesource
  */
-class SyncCtoContaoAutomator extends \Automator
-{
 
-    public function __construct()
+namespace SyncCto\Contao\Maintenance;
+
+use SyncCto\Core\Environment\IEnvironment;
+
+class Automator extends \Automator
+{
+    /**
+     * @var null|IEnvironment
+     */
+    protected $objEnvironment = null;
+
+    /**
+     * Init the environment and call the parent.
+     *
+     * @param $objEnvironment
+     */
+    public function __construct($objEnvironment)
     {
         parent::__construct();
+
+        $this->objEnvironment = $objEnvironment;
     }
 
     /**
@@ -21,7 +37,7 @@ class SyncCtoContaoAutomator extends \Automator
      */
     public function generateInternalCache()
     {
-        if ($GLOBALS['TL_CONFIG']['bypassCache'])
+        if ( $GLOBALS['TL_CONFIG']['bypassCache'] )
         {
             return;
         }
@@ -41,7 +57,7 @@ class SyncCtoContaoAutomator extends \Automator
      */
     public function purgeInternalCache()
     {
-        if ($GLOBALS['TL_CONFIG']['bypassCache'])
+        if ( $GLOBALS['TL_CONFIG']['bypassCache'] )
         {
             return;
         }
@@ -54,7 +70,7 @@ class SyncCtoContaoAutomator extends \Automator
      */
     public function createInternalCache()
     {
-        if ($GLOBALS['TL_CONFIG']['bypassCache'])
+        if ( $GLOBALS['TL_CONFIG']['bypassCache'] )
         {
             return;
         }
@@ -65,6 +81,4 @@ class SyncCtoContaoAutomator extends \Automator
         $this->generateLanguageCache();
         $this->generateDcaExtracts();
     }
-
-
 } 
