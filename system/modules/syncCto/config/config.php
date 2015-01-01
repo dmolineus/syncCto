@@ -16,6 +16,9 @@ $objInput = \Input::getInstance();
  */
 $GLOBALS['SYC_VERSION'] = '2.6.0';
 
+
+$GLOBALS['SYC_CONFIG']['DefaultBuilder'] = 'SyncCto\Core\Environment\DefaultEnvironmentBuilder';
+
 /**
  * Back end modules
  */
