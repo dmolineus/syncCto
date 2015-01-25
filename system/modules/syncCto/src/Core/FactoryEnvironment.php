@@ -50,6 +50,8 @@ class FactoryEnvironment
             throw new \RuntimeException(sprintf('The given builder (%s) for SyncCto is not from type %s', $strClass, 'SyncCto\Core\Environment\IEnvironmentBuilder'));
         }
 
-        self::$objEnvironment = $strClass::buildEnvironment();
+        // ToDo: Add a check for the interface.
+        $objClass             = new $strClass();
+        self::$objEnvironment = $objClass->buildEnvironment();
     }
 } 

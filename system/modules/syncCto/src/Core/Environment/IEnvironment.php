@@ -12,12 +12,49 @@
 namespace SyncCto\Core\Environment;
 
 
-use SyncCto\ClassCaller;
+use SyncCto\Contao\API\Core;
+use SyncCto\Contao\API\Input;
+use SyncCto\Core\ClassCaller;
 use SyncCto\Core\Config;
 use SyncCto\Core\Helper;
 
 interface IEnvironment
 {
+    /**
+     * @param IEnvironmentBuilder $objBuilder
+     *
+     * @return IEnvironment
+     */
+    public function setBuilder($objBuilder);
+
+    /**
+     * Get the API for the System.
+     *
+     * @return Core
+     */
+    public function getContaoApi();
+
+    /**
+     * Set the API for the System.
+     *
+     * @return IEnvironment
+     */
+    public function setContaoApi($objCoreApi);
+
+    /**
+     * Get the API for the System.
+     *
+     * @return Input
+     */
+    public function getInput();
+
+    /**
+     * Set the API for the System.
+     *
+     * @return IEnvironment
+     */
+    public function setInput($objInput);
+
     /**
      * Get the Database from the System.
      *

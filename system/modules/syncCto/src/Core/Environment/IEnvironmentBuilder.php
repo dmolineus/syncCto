@@ -14,5 +14,5 @@ namespace SyncCto\Core\Environment;
 
 interface IEnvironmentBuilder
 {
-   public static function buildEnvironment();
+   public function buildEnvironment();
 } 

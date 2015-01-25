@@ -11,31 +11,104 @@
 
 namespace SyncCto\Core\Environment;
 
-use SyncCto\ClassCaller;
+use SyncCto\Contao\API\Core;
+use SyncCto\Contao\API\Input;
+use SyncCto\Core\ClassCaller;
 use SyncCto\Core\Config;
 use SyncCto\Core\Helper;
 
 class Environment implements IEnvironment
 {
     /**
+     * @var IEnvironmentBuilder
+     */
+    protected $objBuilder;
+
+    /**
      * @var \Database
      */
-    protected $objDatabase = null;
+    protected $objDatabase;
+
+    /**
+     * @var Core
+     */
+    protected $objContaoCoreApi;
+
+    /**
+     * @var Input
+     */
+    protected $objInput;
 
     /**
      * @var Config
      */
-    protected $objConfig = null;
+    protected $objConfig;
 
     /**
      * @var Config
      */
-    protected $objHelper = null;
+    protected $objHelper;
 
     /**
      * @var ClassCaller
      */
-    protected $objClassCaller = null;
+    protected $objClassCaller;
+
+    /**
+     * @param IEnvironmentBuilder $objBuilder
+     *
+     * @return IEnvironment
+     */
+    public function setBuilder($objBuilder)
+    {
+        $this->objBuilder = $objBuilder;
+
+        return $this;
+    }
+
+    /**
+     * Get the API for the System.
+     *
+     * @return Core
+     */
+    public function getContaoApi()
+    {
+        return $this->objContaoCoreApi;
+    }
+
+    /**
+     * Set the API for the System.
+     *
+     * @return IEnvironment
+     */
+    public function setContaoApi($objContaoCoreApi)
+    {
+        $this->objContaoCoreApi = $objContaoCoreApi;
+
+        return $this;
+    }
+
+    /**
+     * Get the API for the System.
+     *
+     * @return Input
+     */
+    public function getInput()
+    {
+        return $this->objInput;
+    }
+
+    /**
+     * Set the API for the System.
+     *
+     * @return IEnvironment
+     */
+    public function setInput($objInput)
+    {
+        $this->objInput = $objInput;
+
+        return $this;
+    }
 
     /**
      * Get the Database from the System.
