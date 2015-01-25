@@ -758,38 +758,14 @@ class SyncCtoHelper extends Backend
 
     /**
      * Execute some operations at last step
+     *
+     * @deprecated Use \SyncCto\Core\ExecuteHooks::executeFinalOperations();
      */
     public function executeFinalOperations()
     {
-        $arrReturn = array();
-
-        // HOOK: do some last operations
-        if ( isset($GLOBALS['TL_HOOKS']['syncExecuteFinalOperations']) && is_array($GLOBALS['TL_HOOKS']['syncExecuteFinalOperations']) )
-        {
-            foreach ( $GLOBALS['TL_HOOKS']['syncExecuteFinalOperations'] as $callback )
-            {
-                try
-                {
-                    $this->log("Start executing TL_HOOK $callback[0] | $callback[1]", __CLASS__ . "|" . __FUNCTION__, TL_GENERAL);
-
-                    $this->import($callback[0]);
-                    $this->$callback[0]->$callback[1]();
-
-                    $this->log("Finished executing TL_HOOK $callback[0] | $callback[1]", __CLASS__ . "|" . __FUNCTION__, TL_GENERAL);
-                }
-                catch ( Exception $exc )
-                {
-                    $arrReturn [] = array(
-                        'callback' => implode("|", $callback),
-                        'info_msg' => "Error by: TL_HOOK $callback[0] | $callback[1] with Msg: " . $exc->getMessage()
-                    );
-
-                    $this->log("Error by: TL_HOOK $callback[0] | $callback[1] with Msg: " . $exc->getMessage(), __CLASS__ . "|" . __FUNCTION__, TL_ERROR);
-                }
-            }
-        }
-
-        return $arrReturn;
+        $objEnv   = \SyncCto\Core\FactoryEnvironment::getEnvironment();
+        $objHooks = new \SyncCto\Core\ExecuteHooks($objEnv);
+        $objHooks->executeFinalOperations();
     }
 
     /* -------------------------------------------------------------------------
@@ -826,7 +802,10 @@ class SyncCtoHelper extends Backend
      */
     public function standardizePath()
     {
-        return call_user_func_array(array('\SyncCto\Core\Helper', 'standardizePath'), func_get_args());
+        $objEnv    = \SyncCto\Core\FactoryEnvironment::getEnvironment();
+        $objHelper = new \SyncCto\Core\Helper($objEnv);
+
+        return call_user_func_array(array($objHelper, 'standardizePath'), func_get_args());
     }
 
     /**

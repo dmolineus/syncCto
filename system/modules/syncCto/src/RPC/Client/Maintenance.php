@@ -9,27 +9,27 @@
  * @filesource
  */
 
-namespace SyncCto\RPC;
+namespace SyncCto\RPC\Client;
 
 
 use SyncCto\Contao\Maintenance\Automator;
-use SyncCto\Contao\Maintenance\Maintenance;
+use SyncCto\Contao\Maintenance\Maintenance as ContaoMaintenance;
 use SyncCto\Core\Environment\IEnvironment;
 use SyncCto\Core\FactoryEnvironment;
 
-class Client
+class Maintenance
 {
     /**
      * @var IEnvironment
      */
-    protected $objEnviroment = null;
+    protected $objEnvironment = null;
 
     /**
      * Init the environment.
      */
     public function __construct()
     {
-        $this->objEnviroment = FactoryEnvironment::getEnvironment();
+        $this->objEnvironment = FactoryEnvironment::getEnvironment();
     }
 
     /**
@@ -37,7 +37,7 @@ class Client
      */
     public function automatorPurgeInternalCache()
     {
-        $objAutomater = new Automator($this->objEnviroment);
+        $objAutomater = new Automator($this->objEnvironment);
 
         return $objAutomater->purgeInternalCache();
     }
@@ -47,7 +47,7 @@ class Client
      */
     public function automatorCreateInternalCache()
     {
-        $objAutomater = new Automator($this->objEnviroment);
+        $objAutomater = new Automator($this->objEnvironment);
 
         return $objAutomater->createInternalCache();
     }
@@ -57,7 +57,7 @@ class Client
      */
     public function maintenance($arrSettings)
     {
-        $objMaintenance = new Maintenance($this->objEnviroment);
+        $objMaintenance = new ContaoMaintenance($this->objEnvironment);
 
         return $objMaintenance->runMaintenance($arrSettings);
     }
@@ -67,7 +67,7 @@ class Client
      */
     public function maintenancePurgeTemp()
     {
-        $objMaintenance = new Maintenance($this->objEnviroment);
+        $objMaintenance = new ContaoMaintenance($this->objEnvironment);
 
         return $objMaintenance->purgeTemp();
     }
