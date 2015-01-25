@@ -9,17 +9,44 @@
  * @filesource
  */
 
+use SyncCto\Core\Environment\IEnvironment;
+use SyncCto\Core\FactoryEnvironment;
+use SyncCto\Step\Pool as StepPool;
+
 /**
  * Class for client interaction
  */
 class SyncCtoModuleClient extends BackendModule
 {
-    /* -------------------------------------------------------------------------
-     * Variablen
+    /**
+     * Sync directions.
      */
+    const SYNC_DIRECTION_TO   = 'To';
+    const SYNC_DIRECTION_FROM = 'From';
 
-    // Vars     
+    /**
+     * Default template for the output.
+     *
+     * @var string
+     */
     protected $strTemplate = 'be_syncCto_steps';
+
+    /**
+     * @var \BackendTemplate
+     */
+    protected $Template;
+
+    /**
+     * @var \BackendUser
+     */
+    protected $BackendUser;
+
+    /**
+     * @var IEnvironment;
+     */
+    protected $objEnvironment;
+
+    // Vars
     protected $objTemplateContent;
     protected $intClientID;
     protected $blnAllMode = false;
@@ -59,11 +86,40 @@ class SyncCtoModuleClient extends BackendModule
      */
     protected $objStepPool;
 
-    /* -------------------------------------------------------------------------
-     * Getter / Setter 
+    /**
+     * Constructor
+     *
+     * @param DataContainer $objDc
      */
+    public function __construct(DataContainer $objDc = null)
+    {
+        // Call parent.
+        parent::__construct($objDc);
+
+        // Init system.
+        $this->objEnvironment = FactoryEnvironment::getEnvironment();
+        $this->BackendUser    = \BackendUser::getInstance();
+        $this->BackendUser->authenticate();
+        $this->objStepPool    = new StepPool($this->objEnvironment);
+        $objApi               = $this->objEnvironment->getContaoApi();
+
+        // Load language
+        $objApi->loadLanguageFile('tl_syncCto_steps');
+        $objApi->loadLanguageFile('tl_syncCto_check');
+
+        // Add some CSS.
+        $objApi->addCss('system/modules/syncCto/assets/css/steps.css');
+
+        // Load helper
+        $this->objSyncCtoDatabase            = SyncCtoDatabase::getInstance();
+        $this->objSyncCtoFiles               = SyncCtoFiles::getInstance();
+        $this->objSyncCtoCommunicationClient = SyncCtoCommunicationClient::getInstance();
+        $this->objSyncCtoHelper              = SyncCtoHelper::getInstance();
+    }
 
     /**
+     * Get the id of the current client.
+     *
      * @return int
      */
     public function getClientID()
@@ -104,7 +160,7 @@ class SyncCtoModuleClient extends BackendModule
     }
 
     /**
-     * Get the client informations
+     * Get the client information
      *
      * @return array
      */
@@ -112,8 +168,6 @@ class SyncCtoModuleClient extends BackendModule
     {
         return $this->arrClientInformation;
     }
-
-    // Template getter / setter ------------------------------------------------
 
     public function isError()
     {
@@ -225,41 +279,9 @@ class SyncCtoModuleClient extends BackendModule
         $this->floStart = $floStart;
     }
 
-    // Special getter / setter -------------------------------------------------
-
     public function addStep()
     {
         $this->intStep++;
-    }
-
-    /* -------------------------------------------------------------------------
-     * Core Functions
-     */
-
-    /**
-     * Constructor
-     *
-     * @param DataContainer $objDc
-     */
-    public function __construct(DataContainer $objDc = null)
-    {
-        parent::__construct($objDc);
-
-        // Load helper
-        $this->objSyncCtoDatabase            = SyncCtoDatabase::getInstance();
-        $this->objSyncCtoFiles               = SyncCtoFiles::getInstance();
-        $this->objSyncCtoCommunicationClient = SyncCtoCommunicationClient::getInstance();
-        $this->objSyncCtoHelper              = SyncCtoHelper::getInstance();
-
-        // Load language 
-        $this->loadLanguageFile("tl_syncCto_steps");
-        $this->loadLanguageFile("tl_syncCto_check");
-
-        // Load CSS
-        $GLOBALS['TL_CSS'][] = 'system/modules/syncCto/assets/css/steps.css';
-
-        // Import
-        $this->import("Backenduser", "User");
     }
 
     /**
@@ -267,96 +289,53 @@ class SyncCtoModuleClient extends BackendModule
      */
     protected function compile()
     {
-        // Check if start is set
-        if ($this->Input->get("act") != "start" && $this->Input->get('table') != 'tl_syncCto_clients_showExtern')
-        {
-            $_SESSION["TL_ERROR"] = array($GLOBALS['TL_LANG']['ERR']['call_directly']);
-            $this->redirect("contao/main.php?do=synccto_clients");
-        }
+        // Get some helper.
+        $objInput     = $this->objEnvironment->getInput();
+        $objContaoApi = $this->objEnvironment->getContaoApi();
 
-        // Get step
-        if ($this->Input->get("step") == "" || $this->Input->get("step") == null)
-        {
-            $this->intStep = 0;
-        }
-        else
-        {
-            $this->intStep = intval($this->Input->get("step"));
-        }
+        // Get some vars.
+        $strMode       = $objInput->get('mode');
+        $strRequestUri = \Environment::get('requestUri');
 
-        // Get Client id or check if we in allmode
-        if (strlen($this->Input->get("id")) != 0 && $this->Input->get("mode") != 'all')
-        {
-            $this->intClientID = intval($this->Input->get("id"));
-        }
-        else
-        {
-            if (strlen($this->Input->get("id")) != 0 && $this->Input->get("mode") == 'all' && $this->Input->get("next") != '1')
-            {
-                $this->blnAllMode  = true;
-                $this->intClientID = intval($this->Input->get("id"));
-            }
-            else
-            {
-                if ($this->Input->get("mode") == 'all')
-                {
-                    $this->blnAllMode = true;
-                    $this->initModeAll();
-                }
-                else
-                {
-                    $_SESSION["TL_ERROR"] = array($GLOBALS['TL_LANG']['ERR']['call_directly']);
-                    $this->redirect("contao/main.php?do=synccto_clients");
-                }
-            }
-        }
+        // Get all $GET parameter.
+        $this->initFromGet();
 
         // Set client for communication
         try
         {
-            $arrClientInformations      = $this->objSyncCtoCommunicationClient->setClientBy(intval($this->intClientID));
-            $this->Template->clientName = $arrClientInformations["title"];
+            $arrClientInformation       = $this->objSyncCtoCommunicationClient->setClientBy(intval($this->intClientID));
+            $this->Template->clientName = $arrClientInformation["title"];
         }
-        catch (Exception $exc)
+        catch ( \Exception $exc )
         {
-            $_SESSION["TL_ERROR"] = array($GLOBALS['TL_LANG']['ERR']['client_set']);
-            $this->log($exc->getMessage(), __CLASS__ . " | " . __FUNCTION__, TL_ERROR);
-            $this->redirect("contao/main.php?do=synccto_clients");
+            $objContaoApi->addErrorMessage($GLOBALS['TL_LANG']['ERR']['client_set']);
+            $objContaoApi->addLog($exc->getMessage(), __CLASS__ . "::" . __FUNCTION__, TL_ERROR);
+            $objContaoApi->redirect('contao/main.php?do=synccto_clients');
         }
 
         // Set template
         $this->Template->showControl    = true;
-        $this->Template->tryAgainLink   = $this->Environment->requestUri . (($this->blnAllMode) ? '&mode=all' : '');
-        $this->Template->abortLink      = $this->Environment->requestUri . "&abort=true" . (($this->blnAllMode) ? '&mode=all' : '');
-        $this->Template->nextClientLink = $this->Environment->requestUri . "&abort=true" . (($this->blnAllMode) ? '&mode=all&next=1' : '');
+        $this->Template->tryAgainLink   = $strRequestUri . (($this->blnAllMode) ? '&mode=all' : '');
+        $this->Template->abortLink      = $strRequestUri . "&abort=true" . (($this->blnAllMode) ? '&mode=all' : '');
+        $this->Template->nextClientLink = $strRequestUri . "&abort=true" . (($this->blnAllMode) ? '&mode=all&next=1' : '');
+
+        // Set the database wait timeout for the current session.
+        $this->setDatabaseTimeOut();
 
         // Load content from session
         if ($this->intStep != 0)
         {
-            $this->loadContenData();
+            $this->loadContentData();
         }
 
         // Load settings from dca
         $this->loadSyncSettings();
         $this->loadClientInformation();
 
-        // Set time out for database. Ticket #2653
-        if ($GLOBALS['TL_CONFIG']['syncCto_custom_settings'] == true
-            && intval($GLOBALS['TL_CONFIG']['syncCto_wait_timeout']) > 0
-            && intval($GLOBALS['TL_CONFIG']['syncCto_interactive_timeout']) > 0
-        )
-        {
-            $this->Database->query('SET SESSION wait_timeout = GREATEST(' . intval($GLOBALS['TL_CONFIG']['syncCto_wait_timeout']) . ', @@wait_timeout), SESSION interactive_timeout = GREATEST(' . intval($GLOBALS['TL_CONFIG']['syncCto_interactive_timeout']) . ', @@wait_timeout);');
-        }
-        else
-        {
-            $this->Database->query('SET SESSION wait_timeout = GREATEST(28000, @@wait_timeout), SESSION interactive_timeout = GREATEST(28000, @@wait_timeout);');
-        }
-
-        if ($this->Input->get("abort") == "true")
+        if ($objInput->get('abort') == 'true')
         {
             // Load content from session
-            $this->loadContenData();
+            $this->loadContentData();
             // So abort page
             $this->pageSyncAbort();
             // Save content in session
@@ -369,7 +348,7 @@ class SyncCtoModuleClient extends BackendModule
         }
 
         // Which table is in use
-        switch ($this->Input->get("table"))
+        switch ($objInput->get("table"))
         {
             case "tl_syncCto_clients_syncTo":
                 $this->pageSyncTo();
@@ -384,8 +363,8 @@ class SyncCtoModuleClient extends BackendModule
                 break;
 
             default :
-                $_SESSION["TL_ERROR"][] = $GLOBALS['TL_LANG']['ERR']['unknown_function'];
-                $this->redirect("contao/main.php?do=synccto_clients");
+                $objContaoApi->addErrorMessage($GLOBALS['TL_LANG']['ERR']['unknown_function']);
+                $objContaoApi->redirect('contao/main.php?do=synccto_clients');
                 break;
         }
 
@@ -394,8 +373,8 @@ class SyncCtoModuleClient extends BackendModule
         $this->saveClientInformation();
         $this->saveSyncSettings();
 
-        // Save the informations for mode all.
-        if ($this->Input->get("mode") == 'all')
+        // Save the information for mode all.
+        if ($strMode == 'all')
         {
             $this->saveStepPoolAll();
         }
@@ -405,12 +384,102 @@ class SyncCtoModuleClient extends BackendModule
     }
 
     /**
+     * Get all parameters from the $GET and check them.
+     */
+    protected function initFromGet()
+    {
+        // Load some helper.
+        $objInput     = $this->objEnvironment->getInput();
+        $objContaoApi = $this->objEnvironment->getContaoApi();
+
+        $strAct        = $objInput->get('act');
+        $strTable      = $objInput->get('table');
+        $strStep       = $objInput->get('step');
+        $strMode       = $objInput->get('mode');
+        $strID         = $objInput->get('id');
+        $strNext       = $objInput->get('next');
+
+        // Check if start is set
+        if ($strAct != 'start' && $strTable != 'tl_syncCto_clients_showExtern')
+        {
+            $objContaoApi->addErrorMessage($GLOBALS['TL_LANG']['ERR']['call_directly']);
+            $objContaoApi->redirect('contao/main.php?do=synccto_clients');
+        }
+
+        // Get step
+        if ($strStep == "" || $strStep == null)
+        {
+            $this->intStep = 0;
+        }
+        else
+        {
+            $this->intStep = intval($strStep);
+        }
+
+        // Get Client id or check if we in allmode
+        if (strlen($strID) != 0 && $strMode != 'all')
+        {
+            $this->intClientID = intval($strID);
+        }
+        else
+        {
+            if (strlen($strID) != 0 && $strMode == 'all' && $strNext != '1')
+            {
+                $this->blnAllMode  = true;
+                $this->intClientID = intval($strID);
+            }
+            else
+            {
+                if ($strMode == 'all')
+                {
+                    $this->blnAllMode = true;
+                    $this->initModeAll();
+                }
+                else
+                {
+                    $objContaoApi->addErrorMessage($GLOBALS['TL_LANG']['ERR']['call_directly']);
+                    $objContaoApi->redirect('contao/main.php?do=synccto_clients');
+                }
+            }
+        }
+    }
+
+    /**
+     * Set the database timeouts.
+     */
+    protected function setDatabaseTimeOut()
+    {
+        // Load some helper.
+        $objDatabase  = $this->objEnvironment->getSystemDatabase();
+
+        // Set time out for database. Ticket #2653
+        if ($GLOBALS['TL_CONFIG']['syncCto_custom_settings'] == true
+            && intval($GLOBALS['TL_CONFIG']['syncCto_wait_timeout']) > 0
+            && intval($GLOBALS['TL_CONFIG']['syncCto_interactive_timeout']) > 0
+        )
+        {
+            $objDatabase
+                ->query('SET SESSION wait_timeout = GREATEST(' . intval($GLOBALS['TL_CONFIG']['syncCto_wait_timeout']) . ', @@wait_timeout), SESSION interactive_timeout = GREATEST(' . intval($GLOBALS['TL_CONFIG']['syncCto_interactive_timeout']) . ', @@wait_timeout);');
+        }
+        else
+        {
+            $objDatabase
+                ->query('SET SESSION wait_timeout = GREATEST(28000, @@wait_timeout), SESSION interactive_timeout = GREATEST(28000, @@wait_timeout);');
+        }
+    }
+
+    /**
      * Init the data array for syncAll or load it from session.
      *
      * @return void
      */
     protected function initModeAll()
     {
+        // Load some helper.
+        $objInput     = $this->objEnvironment->getInput();
+        $objDatabase  = $this->objEnvironment->getSystemDatabase();
+
+        // Preset the array with some default values.
         $this->arrModeAll = array(
             'clientIds' => array(),
             'index'     => -1,
@@ -418,12 +487,12 @@ class SyncCtoModuleClient extends BackendModule
         );
 
         // Check if we have a init call.
-        if ($this->Input->get('init') == 1)
+        if ($objInput->get('init') == 1)
         {
             // Get a list with all client.
-            $objClients = $this->Database->query('SELECT id FROM tl_synccto_clients');
+            $objClients = $objDatabase->query('SELECT id FROM tl_synccto_clients');
 
-            // ToDo: Add a check for premissions.
+            // ToDo: Add a check for permissions.
 
             $this->arrModeAll = array(
                 'clientIds' => $objClients->fetchEach('id'),
@@ -448,7 +517,7 @@ class SyncCtoModuleClient extends BackendModule
         // Set client id.
         else
         {
-            if ($this->Input->get('next') == 1)
+            if ($objInput->get('next') == 1)
             {
                 // Increase everything.
                 $this->arrModeAll['index']++;
@@ -468,13 +537,15 @@ class SyncCtoModuleClient extends BackendModule
         $this->saveStepPoolAll();
     }
 
-    /* -------------------------------------------------------------------------
-     * Helper function for session/tempfiles etc.
+    /**
+     * Set the default template vars.
      */
-
     protected function setTemplateVars()
     {
-        // Set Tempalte
+        // Load some helper.
+        $objInput = $this->objEnvironment->getInput();
+
+        // Set Template.
         $this->Template->goBack      = $this->strGoBack;
         $this->Template->data        = $this->objData->getArrValues();
         $this->Template->step        = $this->intStep;
@@ -489,20 +560,17 @@ class SyncCtoModuleClient extends BackendModule
         $this->Template->finished    = $this->booFinished;
         $this->Template->allMode     = $this->blnAllMode;
 
-        if ($this->Input->get('table') == 'tl_syncCto_clients_syncTo')
+        if ( $objInput->get('table') == 'tl_syncCto_clients_syncTo' )
         {
             $this->Template->direction = 'to';
         }
+        elseif ( $objInput->get('table') == 'tl_syncCto_clients_syncFrom' )
+        {
+            $this->Template->direction = 'from';
+        }
         else
         {
-            if ($this->Input->get('table') == 'tl_syncCto_clients_syncFrom')
-            {
-                $this->Template->direction = 'from';
-            }
-            else
-            {
-                $this->Template->direction = 'na';
-            }
+            $this->Template->direction = 'na';
         }
     }
 
@@ -511,7 +579,7 @@ class SyncCtoModuleClient extends BackendModule
      */
     protected function saveContentData()
     {
-        $arrContenData = array(
+        $arrContentData = array(
             "error"       => $this->booError,
             "error_msg"   => $this->strError,
             "refresh"     => $this->booRefresh,
@@ -526,30 +594,30 @@ class SyncCtoModuleClient extends BackendModule
             "abort"       => $this->booAbort,
         );
 
-        $this->Session->set("syncCto_Content", $arrContenData);
+        $this->Session->set("syncCto_Content", $arrContentData);
     }
 
     /**
      * Load the current state of the page/synchronization
      */
-    protected function loadContenData()
+    protected function loadContentData()
     {
-        $arrContenData = $this->Session->get("syncCto_Content");
+        $arrContentData = $this->Session->get("syncCto_Content");
 
-        if (is_array($arrContenData) && count($arrContenData) != 0)
+        if (is_array($arrContentData) && count($arrContentData) != 0)
         {
-            $this->booError       = $arrContenData["error"];
-            $this->booAbort       = $arrContenData["abort"];
-            $this->booFinished    = $arrContenData["finished"];
-            $this->booRefresh     = $arrContenData["refresh"];
-            $this->strError       = $arrContenData["error_msg"];
-            $this->strUrl         = $arrContenData["url"];
-            $this->strGoBack      = $arrContenData["goBack"];
-            $this->strHeadline    = $arrContenData["headline"];
-            $this->strInformation = $arrContenData["information"];
-            $this->intStep        = $arrContenData["step"];
-            $this->floStart       = $arrContenData["start"];
-            $this->objData        = new ContentData($arrContenData["data"], $this->intStep);
+            $this->booError       = $arrContentData["error"];
+            $this->booAbort       = $arrContentData["abort"];
+            $this->booFinished    = $arrContentData["finished"];
+            $this->booRefresh     = $arrContentData["refresh"];
+            $this->strError       = $arrContentData["error_msg"];
+            $this->strUrl         = $arrContentData["url"];
+            $this->strGoBack      = $arrContentData["goBack"];
+            $this->strHeadline    = $arrContentData["headline"];
+            $this->strInformation = $arrContentData["information"];
+            $this->intStep        = $arrContentData["step"];
+            $this->floStart       = $arrContentData["start"];
+            $this->objData        = new ContentData($arrContentData["data"], $this->intStep);
         }
         else
         {
@@ -568,46 +636,17 @@ class SyncCtoModuleClient extends BackendModule
         }
     }
 
-    protected function loadStepPool()
+    public function saveStepPoolAll()
     {
-        $arrStepPool = $this->Session->get("syncCto_" . $this->intClientID . "_StepPool" . $this->intStep);
-
-        if ($arrStepPool == false || !is_array($arrStepPool))
-        {
-            $arrStepPool = array();
-        }
-
-        $this->objStepPool = new StepPool($arrStepPool, $this->intStep);
-    }
-
-    protected function saveStepPool()
-    {
-        $this->Session->set("syncCto_" . $this->intClientID . "_StepPool" . $this->objStepPool->getIntStepID(), $this->objStepPool->getArrValues());
-    }
-
-    protected function resetStepPool()
-    {
-        $this->Session->set("syncCto_" . $this->intClientID . "_StepPool" . $this->objStepPool->getIntStepID(), false);
-    }
-
-    protected function resetStepPoolByID($arrID)
-    {
-        foreach ($arrID as $value)
-        {
-            $this->Session->set("syncCto_" . $this->intClientID . "_StepPool" . $value, false);
-        }
-    }
-
-    protected function saveStepPoolAll()
-    {
-        $this->Session->set("syncCto_All_StepPool", $this->arrModeAll);
+        $objInput = $this->objEnvironment->getInput();
+        $objInput->setSession("syncCto_All_StepPool", $this->arrModeAll);
     }
 
     protected function loadStepPoolAll()
     {
         $arrStepPool = $this->Session->get("syncCto_All_StepPool");
 
-        if ($arrStepPool == false || !is_array($arrStepPool))
+        if ( $arrStepPool == false || !is_array($arrStepPool) )
         {
             $arrStepPool = array();
         }
@@ -615,14 +654,15 @@ class SyncCtoModuleClient extends BackendModule
         $this->arrModeAll = $arrStepPool;
     }
 
+
     protected function initTempLists()
     {
         // Load Files
-        $objFileList = new File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "syncfilelist-ID-" . $this->intClientID . ".txt"));
+        $objFileList = new \File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "syncfilelist-ID-" . $this->intClientID . ".txt"));
         $objFileList->delete();
         $objFileList->close();
 
-        $objCompareList = new File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "synccomparelist-ID-" . $this->intClientID . ".txt"));
+        $objCompareList = new \File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "synccomparelist-ID-" . $this->intClientID . ".txt"));
         $objCompareList->delete();
         $objCompareList->close();
     }
@@ -712,7 +752,7 @@ class SyncCtoModuleClient extends BackendModule
 
     protected function checkSyncFileList()
     {
-        if (!key_exists("syncCto_Type", $this->arrSyncSettings) || count($this->arrSyncSettings["syncCto_Type"]) == 0)
+        if (!array_key_exists("syncCto_Type", $this->arrSyncSettings) || count($this->arrSyncSettings["syncCto_Type"]) == 0)
         {
             return false;
         }
@@ -735,7 +775,7 @@ class SyncCtoModuleClient extends BackendModule
 
     protected function checkSyncDatabase()
     {
-        if (!key_exists('syncCto_SyncDatabase', $this->arrSyncSettings))
+        if (!array_key_exists('syncCto_SyncDatabase', $this->arrSyncSettings))
         {
             return false;
         }
@@ -743,9 +783,76 @@ class SyncCtoModuleClient extends BackendModule
         return $this->arrSyncSettings['syncCto_SyncDatabase'];
     }
 
-    /* -------------------------------------------------------------------------
-     * Functions for comunication
+    /**
+     * Init for To/From the first call.
+     *
+     * @param string $strDirection The direction => To | From
      */
+    protected function iniStepZero($strDirection)
+    {
+        // Throw a exception if direction is not To or From.
+        if($strDirection != self::SYNC_DIRECTION_TO && $strDirection != self::SYNC_DIRECTION_FROM)
+        {
+            throw new \RuntimeException('Unknow direction ' . $strDirection);
+        }
+
+        // Load some helper.
+        $objDatabase  = $this->objEnvironment->getSystemDatabase();
+        $objContaoApi = $this->objEnvironment->getContaoApi();
+        $objInput     = $this->objEnvironment->getInput();
+
+        // Init content
+        $this->booError       = false;
+        $this->booAbort       = false;
+        $this->booFinished    = false;
+        $this->strError       = "";
+        $this->booRefresh     = true;
+        $this->strUrl         = 'contao/main.php?do=synccto_clients&amp;table=tl_syncCto_clients_sync' . $strDirection . '&amp;act=start&amp;id=' . $this->intClientID;
+        $this->strGoBack      = $this->Environment->base . "contao/main.php?do=synccto_clients";
+        $this->strHeadline    = $GLOBALS['TL_LANG']['tl_syncCto_sync']['edit'];
+        $this->strInformation = "";
+        $this->intStep        = 1;
+        $this->floStart       = microtime(true);
+        $this->objData        = new ContentData(array(), $this->intStep);
+
+        // If mode all, add it to url.
+        if ($this->blnAllMode)
+        {
+            $this->strUrl .= '&amp;mode=all';
+        }
+
+        // Init temp files.
+        $this->initTempLists();
+
+        //  Add stats and write log
+        if ( $strDirection == self::SYNC_DIRECTION_TO )
+        {
+            $objContaoApi->addLog(sprintf('Start synchronization client ID %s.', $objInput->get("id")), __CLASS__ . "::" . __FUNCTION__, TL_GENERAL);
+            SyncCtoStats::getInstance()->addStartStat($this->BackendUser->id, $this->intClientID, time(), $this->arrSyncSettings, SyncCtoStats::SYNCDIRECTION_TO);
+
+            $objDatabase
+                ->prepare("UPDATE `tl_synccto_clients` %s WHERE `tl_synccto_clients`.`id` = ?")
+                ->set(array("syncTo_user" => $this->BackendUser->id, "syncTo_tstamp" => time()))
+                ->execute($this->intClientID);
+        }
+        else if ( $strDirection == self::SYNC_DIRECTION_FROM )
+        {
+            $objContaoApi->addLog(sprintf('Start synchronization server with client ID %s.', $objInput->get("id")), __CLASS__ . "::" . __FUNCTION__, TL_GENERAL);
+            SyncCtoStats::getInstance()->addStartStat($this->BackendUser->id, $this->intClientID, time(), $this->arrSyncSettings, SyncCtoStats::SYNCDIRECTION_FROM);
+
+            $objDatabase
+                ->prepare("UPDATE `tl_synccto_clients` %s WHERE `tl_synccto_clients`.`id` = ?")
+                ->set(array("syncFrom_user" => $this->User->id, "syncFrom_tstamp" => time()))
+                ->execute($this->intClientID);
+        }
+
+        // Reset some Sessions
+        $this->objStepPool->resetStepPoolByID(array(1, 2, 3, 4, 5, 6, 7));
+        $this->resetClientInformation();
+
+        // Set lock flag for current client.
+        $objInput->setSession("SyncCto_FileLock_ID" . $this->intClientID,array("lock" => false));
+    }
 
     /**
      * Setup for page syncTo
@@ -755,45 +862,7 @@ class SyncCtoModuleClient extends BackendModule
         // Init | Set Step to 1
         if ($this->intStep == 0)
         {
-            // Init content
-            $this->booError       = false;
-            $this->booAbort       = false;
-            $this->booFinished    = false;
-            $this->strError       = "";
-            $this->booRefresh     = true;
-            $this->strUrl         = "contao/main.php?do=synccto_clients&amp;table=tl_syncCto_clients_syncTo&amp;act=start&amp;id=" . $this->intClientID;
-            $this->strGoBack      = $this->Environment->base . "contao/main.php?do=synccto_clients";
-            $this->strHeadline    = $GLOBALS['TL_LANG']['tl_syncCto_sync']['edit'];
-            $this->strInformation = "";
-            $this->intStep        = 1;
-            $this->floStart       = microtime(true);
-            $this->objData        = new ContentData(array(), $this->intStep);
-
-            // If mode all, add it to url.
-            if ($this->blnAllMode)
-            {
-                $this->strUrl .= '&amp;mode=all';
-            }
-
-            // Init tmep files
-            $this->initTempLists();
-
-            // Update last sync
-            $this->Database->prepare("UPDATE `tl_synccto_clients` %s WHERE `tl_synccto_clients`.`id` = ?")
-                ->set(array("syncTo_user" => $this->User->id, "syncTo_tstamp" => time()))
-                ->execute($this->intClientID);
-
-            // Add stats
-            SyncCtoStats::getInstance()->addStartStat($this->User->id, $this->intClientID, time(), $this->arrSyncSettings, SyncCtoStats::SYNCDIRECTION_TO);
-
-            // Write log
-            $this->log(vsprintf("Start synchronization client ID %s.", array($this->Input->get("id"))), __CLASS__ . " " . __FUNCTION__, "INFO");
-
-            // Reset some Sessions
-            $this->resetStepPoolByID(array(1, 2, 3, 4, 5, 6, 7));
-            $this->resetClientInformation();
-
-            $this->Session->set("SyncCto_FileLock_ID" . $this->intClientID, array("lock" => false));
+           $this->iniStepZero(self::SYNC_DIRECTION_TO);
         }
 
         // Check if we have to do the current step
@@ -894,7 +963,7 @@ class SyncCtoModuleClient extends BackendModule
         }
 
         // Load step pool for current step
-        $this->loadStepPool();
+        $this->objStepPool->loadStepPool($this->intClientID, $this->intStep);
 
         // Load Step
         switch ($this->intStep)
@@ -935,7 +1004,7 @@ class SyncCtoModuleClient extends BackendModule
                 $this->saveTempLists();
                 break;
 
-            // Cleanup | Show informations
+            // Cleanup | Show information
             case 7:
                 $this->loadTempLists();
                 $this->pageSyncToShowStep7();
@@ -949,7 +1018,7 @@ class SyncCtoModuleClient extends BackendModule
         }
 
         // Save step pool for current step
-        $this->saveStepPool();
+        $this->objStepPool->saveStepPool();
     }
 
     /**
@@ -961,39 +1030,7 @@ class SyncCtoModuleClient extends BackendModule
         // Init | Set Step to 1
         if ($this->intStep == 0)
         {
-            // Init content
-            $this->booError       = false;
-            $this->booAbort       = false;
-            $this->booFinished    = false;
-            $this->strError       = "";
-            $this->booRefresh     = true;
-            $this->strUrl         = "contao/main.php?do=synccto_clients&amp;table=tl_syncCto_clients_syncFrom&amp;act=start&amp;id=" . $this->intClientID;
-            $this->strGoBack      = $this->Environment->base . "contao/main.php?do=synccto_clients";
-            $this->strHeadline    = $GLOBALS['TL_LANG']['tl_syncCto_sync']['edit'];
-            $this->strInformation = "";
-            $this->intStep        = 1;
-            $this->floStart       = microtime(true);
-            $this->objData        = new ContentData(array(), $this->intStep);
-
-            // Init tmep files
-            $this->initTempLists();
-
-            // Update last sync
-            $this->Database->prepare("UPDATE `tl_synccto_clients` %s WHERE `tl_synccto_clients`.`id` = ?")
-                ->set(array("syncFrom_user" => $this->User->id, "syncFrom_tstamp" => time()))
-                ->execute($this->intClientID);
-
-            // Add stats
-            SyncCtoStats::getInstance()->addStartStat($this->User->id, $this->intClientID, time(), $this->arrSyncSettings, SyncCtoStats::SYNCDIRECTION_FROM);
-
-            // Write log
-            $this->log(vsprintf("Start synchronization server with client ID %s.", array($this->Input->get("id"))), __CLASS__ . " " . __FUNCTION__, "INFO");
-
-            // Reset some Sessions
-            $this->resetStepPoolByID(array(1, 2, 3, 4, 5, 6, 7));
-            $this->resetClientInformation();
-
-            $this->Session->set("SyncCto_FileLock_ID" . $this->intClientID, array("lock" => false));
+            $this->iniStepZero(self::SYNC_DIRECTION_FROM);
         }
 
         // Check if we have to do the current step
@@ -1094,7 +1131,7 @@ class SyncCtoModuleClient extends BackendModule
         }
 
         // Load step pool for current step
-        $this->loadStepPool();
+        $this->getStepPool()->loadStepPool($this->intClientID, $this->intStep);
 
         // Load Step
         switch ($this->intStep)
@@ -1135,7 +1172,7 @@ class SyncCtoModuleClient extends BackendModule
                 $this->saveTempLists();
                 break;
 
-            // Show informations
+            // Show information
             case 7:
                 $this->loadTempLists();
                 $this->pageSyncFromShowStep7();
@@ -1149,7 +1186,7 @@ class SyncCtoModuleClient extends BackendModule
         }
 
         // Save step pool for current step
-        $this->saveStepPool();
+       $this->objStepPool->saveStepPool();
     }
 
     /**
@@ -1186,7 +1223,7 @@ class SyncCtoModuleClient extends BackendModule
         }
 
         // Load step pool for current step
-        $this->loadStepPool();
+        $this->objStepPool->loadStepPool($this->intClientID, $this->intStep);
 
         /* ---------------------------------------------------------------------
          * Run page
@@ -1297,7 +1334,7 @@ class SyncCtoModuleClient extends BackendModule
         }
 
         // Save step pool for current step
-        $this->saveStepPool();
+        $this->objStepPool->saveStepPool();
     }
 
     /* -------------------------------------------------------------------------
@@ -1418,7 +1455,8 @@ class SyncCtoModuleClient extends BackendModule
                  */
                 case 5:
                     $this->objSyncCtoCommunicationClient->purgeTempFolder();
-                    $this->objSyncCtoFiles->purgeTemp();
+                    $objMaintenance = new SyncCto\Contao\Maintenance\Maintenance($this->objEnvironment);
+                    $objMaintenance->purgeTemp();
 
                     // Current step is okay.
                     $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_1"]['description_1']);
@@ -3153,10 +3191,11 @@ class SyncCtoModuleClient extends BackendModule
                  * Cleanup
                  */
                 case 10:
-                    if (in_array("temp_folders", $this->arrSyncSettings["syncCto_Systemoperations_Maintenance"]))
+                    if ( in_array("temp_folders", $this->arrSyncSettings["syncCto_Systemoperations_Maintenance"]) )
                     {
                         $this->objSyncCtoCommunicationClient->purgeTempFolder();
-                        $this->objSyncCtoFiles->purgeTemp();
+                        $objMaintenance = new SyncCto\Contao\Maintenance\Maintenance($this->objEnvironment);
+                        $objMaintenance->purgeTemp();
                     }
 
                     $this->objStepPool->step++;
@@ -4817,7 +4856,8 @@ class SyncCtoModuleClient extends BackendModule
                  */
                 case 2:
                     $this->objSyncCtoCommunicationClient->purgeTempFolder();
-                    $this->objSyncCtoFiles->purgeTemp();
+                    $objMaintenance = new SyncCto\Contao\Maintenance\Maintenance($this->objEnvironment);
+                    $objMaintenance->purgeTemp();
                     $this->objStepPool->step++;
                     break;
 
