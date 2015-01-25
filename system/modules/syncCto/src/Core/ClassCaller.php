@@ -6,7 +6,7 @@
  * Time: 21:27
  */
 
-namespace SyncCto;
+namespace SyncCto\Core;
 
 
 use SyncCto\Core\Environment\IEnvironment;

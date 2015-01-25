@@ -673,7 +673,7 @@ $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_DBAFS_INFORMATION"] = array
 // Contao internal cache.
 $GLOBALS['CTOCOM_FUNCTIONS']['SYNCCTO_PURGE_CACHE'] = array
 (
-    'class'              => 'SyncCto\RPC\Client\Maintenance',
+    'class'              => '\SyncCto\RPC\Client\Maintenance',
     'function'           => 'automatorPurgeInternalCache',
     'typ'                => 'GET',
     'parameter'          => FALSE
@@ -682,7 +682,7 @@ $GLOBALS['CTOCOM_FUNCTIONS']['SYNCCTO_PURGE_CACHE'] = array
 // Contao internal cache.
 $GLOBALS['CTOCOM_FUNCTIONS']['SYNCCTO_CREATE_CACHE'] = array
 (
-    'class'              => 'SyncCto\RPC\Client\Maintenance',
+    'class'              => '\SyncCto\RPC\Client\Maintenance',
     'function'           => 'automatorCreateInternalCache',
     'typ'                => 'GET',
     'parameter'          => FALSE
@@ -691,16 +691,16 @@ $GLOBALS['CTOCOM_FUNCTIONS']['SYNCCTO_CREATE_CACHE'] = array
 // Run maintenance.
 $GLOBALS['CTOCOM_FUNCTIONS']['SYNCCTO_MAINTENANCE'] = array
 (
-    'class'              => 'SyncCto\RPC\Client\Maintenance',
+    'class'              => '\SyncCto\RPC\Client\Maintenance',
     'function'           => 'maintenance',
     'typ'                => 'POST',
     'parameter'          => array('options')
 );
 
 // Clear temp folder.
-$GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_PURGETEMP"] = array
+$GLOBALS['CTOCOM_FUNCTIONS']['SYNCCTO_PURGETEMP'] = array
 (
-    'class'              => 'SyncCto\RPC\Client\Maintenance',
+    'class'              => '\SyncCto\RPC\Client\Maintenance',
     'function'           => 'maintenancePurgeTemp',
     'typ'                => 'GET',
     'parameter'          => FALSE
@@ -727,12 +727,12 @@ $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_SET_ATTENTION_FLAG"] = array
 );
 
 // Execute last step operations
-$GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_EXECUTE_FINAL_OPERATIONS"] = array
+$GLOBALS['CTOCOM_FUNCTIONS']['SYNCCTO_EXECUTE_FINAL_OPERATIONS'] = array
 (
-    "class"              => "SyncCtoHelper",
-    "function"           => "executeFinalOperations",
-    "typ"                => "GET",
-    "parameter"          => FALSE,
+    'class'              => '\SyncCto\RPC\Client\Hooks',
+    'function'           => 'executeFinalOperations',
+    'typ'                => 'GET',
+    'parameter'          => FALSE,
 );
 
 // - Informations --------------------------------------------------------------
