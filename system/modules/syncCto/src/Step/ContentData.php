@@ -15,19 +15,26 @@
 class ContentData
 {
 
+    /**
+     * @var array
+     */
     protected $arrValues;
+
+    /**
+     * @var int
+     */
     protected $intStep;
 
     /**
      *
-     * @param type $arrContentData
-     * @param type $intStep
+     * @param array $arrContentData
+     * @param int   $intStep
      */
     public function __construct($arrContentData, $intStep)
     {
         $this->arrValues = $arrContentData;
 
-        if (!is_array($this->arrValues))
+        if ( !is_array($this->arrValues) )
         {
             $this->arrValues = array();
         }
