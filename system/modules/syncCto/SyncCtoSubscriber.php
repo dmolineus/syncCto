@@ -35,6 +35,10 @@ class SyncCtoSubscriber
      */
     public static function registerEvents(CreateEventDispatcherEvent $event)
     {
+        if (TL_MODE === 'FE') {
+            return;
+        }
+
         $dispatcher = $event->getEventDispatcher();
 
         /*
